@@ -30,6 +30,7 @@
 #import "CrashReportViewController.h"
 #import "NotificationsViewController.h"
 #import "SoundUtil.h"
+#import "QuickPostViewController.h"
 
 // Height for reader/notification/blog cells
 #define SIDEBAR_CELL_HEIGHT 51.0f
@@ -510,9 +511,26 @@ NSLog(@"%@", self.sectionInfoArray);
     }
 }
 
+#pragma mark - Quick Post Methods
+
+- (void) quickPhotoButtonViewTapped:(QuickPhotoButtonView *)sender {
+    QuickPostViewController *quickPostViewController = [[QuickPostViewController alloc] init];
+    quickPostViewController.sidebarViewController = self;
+
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:quickPostViewController];
+    if (IS_IPAD) {
+        navController.modalPresentationStyle = UIModalPresentationFormSheet;
+        navController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        [self.panelNavigationController presentModalViewController:navController animated:YES];
+    } else {
+        [self.panelNavigationController presentModalViewController:navController animated:YES];
+    }
+}
+
+
 #pragma mark - Quick Photo Methods
 
-- (void)quickPhotoButtonViewTapped:(QuickPhotoButtonView *)sender {
+- (void)quickPhotoButtonViewTappedOrig:(QuickPhotoButtonView *)sender {
     [FileLogger log:@"%@ %@", self, NSStringFromSelector(_cmd)];
 
     if (quickPhotoActionSheet) {
@@ -521,7 +539,9 @@ NSLog(@"%@", self.sectionInfoArray);
     }
     
     [self.panelNavigationController showSidebar];
+
     
+
 	UIActionSheet *actionSheet = nil;
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         if ([[CameraPlusPickerManager sharedManager] cameraPlusPickerAvailable]) {

@@ -105,7 +105,6 @@
 								<string key="NSFrameSize">{320, 44}</string>
 								<reference key="NSSuperview" ref="953103743"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<object class="NSColor" key="IBUIBackgroundColor" id="638103476">
 									<int key="NSColorSpace">1</int>
@@ -366,7 +365,7 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="SidebarToolbarButtonHighlighted.png">{10, 34}</string>
+			<string key="SidebarToolbarButtonHighlighted.png">{20, 44}</string>
 			<string key="UISegmentBarBlackButtonHighlighted.png">{12, 30}</string>
 			<string key="sidebar-logo.png">{61, 61}</string>
 			<string key="sidebar_settings.png">{22, 22}</string>

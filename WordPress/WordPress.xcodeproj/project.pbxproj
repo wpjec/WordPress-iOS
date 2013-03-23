@@ -275,6 +275,8 @@
 		37F66E28167FB5D50043E8CA /* navbar_toggle@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 37F66E26167FB5D50043E8CA /* navbar_toggle@2x.png */; };
 		37F66E29167FB5D50043E8CA /* navbar_toggle.png in Resources */ = {isa = PBXBuildFile; fileRef = 37F66E27167FB5D50043E8CA /* navbar_toggle.png */; };
 		37F74137131866A600AED18A /* CommentViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37F74136131866A600AED18A /* CommentViewController.xib */; };
+		4268733F16FDF4C100BBD539 /* QuickPostViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4268733E16FDF4C100BBD539 /* QuickPostViewController.m */; };
+		4268734316FDFB1400BBD539 /* QuickPostViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4268734216FDFB1400BBD539 /* QuickPostViewController.xib */; };
 		4526DC551148072F0090C99D /* Default-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = 4526DC531148072F0090C99D /* Default-Portrait.png */; };
 		4526DC561148072F0090C99D /* Default-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = 4526DC541148072F0090C99D /* Default-Landscape.png */; };
 		45C73C25113C36F70024D0D2 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 45C73C24113C36F70024D0D2 /* MainWindow-iPad.xib */; };
@@ -1009,6 +1011,9 @@
 		37F66E26167FB5D50043E8CA /* navbar_toggle@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "navbar_toggle@2x.png"; path = "Resources/Images/navbar_toggle@2x.png"; sourceTree = "<group>"; };
 		37F66E27167FB5D50043E8CA /* navbar_toggle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = navbar_toggle.png; path = Resources/Images/navbar_toggle.png; sourceTree = "<group>"; };
 		37F74136131866A600AED18A /* CommentViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = CommentViewController.xib; path = Resources/CommentViewController.xib; sourceTree = "<group>"; };
+		4268733D16FDF4C100BBD539 /* QuickPostViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuickPostViewController.h; sourceTree = "<group>"; };
+		4268733E16FDF4C100BBD539 /* QuickPostViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuickPostViewController.m; sourceTree = "<group>"; };
+		4268734216FDFB1400BBD539 /* QuickPostViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = QuickPostViewController.xib; path = Resources/QuickPostViewController.xib; sourceTree = "<group>"; };
 		4526DC531148072F0090C99D /* Default-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait.png"; sourceTree = "<group>"; };
 		4526DC541148072F0090C99D /* Default-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape.png"; sourceTree = "<group>"; };
 		45B71DE4113EDAA100D0A33C /* Entitlements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
@@ -2339,6 +2344,8 @@
 				2F970F730DF92274006BD934 /* PostsViewController.m */,
 				E1497BBA12CCA8270022BCD9 /* PostViewController.h */,
 				E1497BBB12CCA8270022BCD9 /* PostViewController.m */,
+				4268733D16FDF4C100BBD539 /* QuickPostViewController.h */,
+				4268733E16FDF4C100BBD539 /* QuickPostViewController.m */,
 			);
 			name = Post;
 			sourceTree = "<group>";
@@ -2614,6 +2621,7 @@
 				ACBAB67C0E1247CC00F38795 /* PostPreviewViewController.xib */,
 				ACBAB6080E121CF700F38795 /* PostSettingsViewController.xib */,
 				ACC156BA0E10D73100D6E1A0 /* EditPostViewController~iphone.xib */,
+				4268734216FDFB1400BBD539 /* QuickPostViewController.xib */,
 				E13FA0CB134BDCBB007DCDD0 /* QuickPhotoViewController.xib */,
 			);
 			name = Post;
@@ -3617,6 +3625,7 @@
 				E12A08E416C9706200E3DDF6 /* clouds_header@2x.png in Resources */,
 				E15051CE16CA8E4900D3DDDC /* logo_jetpack.png in Resources */,
 				E15051CF16CA8E4900D3DDDC /* logo_jetpack@2x.png in Resources */,
+				4268734316FDFB1400BBD539 /* QuickPostViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3832,6 +3841,7 @@
 				E1D0D82B16D3D19200E33F4C /* PocketAPIOperation.m in Sources */,
 				E1D0D84716D3D2EA00E33F4C /* PocketActivity.m in Sources */,
 				E15051CB16CA5DDB00D3DDDC /* Blog+Jetpack.m in Sources */,
+				4268733F16FDF4C100BBD539 /* QuickPostViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
