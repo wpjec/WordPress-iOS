@@ -9,6 +9,7 @@
 #import "QuickPostViewController.h"
 #import "FileLogger.h"
 #import "SidebarViewController.h"
+#import "UIView+Entice.h"
 
 @interface QuickPostViewController ()
 
@@ -36,6 +37,14 @@
     [postButton setEnabled:NO];
     self.navigationItem.rightBarButtonItem = postButton;
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
+
+    self.placeholderLabel.text = NSLocalizedString(@"Tap here to begin writing", @"Placeholder for the main body text. Should hint at tapping to enter text (not specifying body text).");
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    self.placeholderLabel.center = self.bodyTextView.center;
+
+    [self.placeholderLabel entice];
 }
 
 - (void)didReceiveMemoryWarning {

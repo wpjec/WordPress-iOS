@@ -12,6 +12,8 @@
 
 @interface QuickPostViewController : UIViewController
 
+@property (nonatomic, strong) IBOutlet UILabel *placeholderLabel;
+@property (nonatomic, strong) IBOutlet UITextView *bodyTextView;
 @property (nonatomic, weak) SidebarViewController *sidebarViewController;
 
 @end

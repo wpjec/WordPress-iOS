@@ -277,6 +277,7 @@
 		37F74137131866A600AED18A /* CommentViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37F74136131866A600AED18A /* CommentViewController.xib */; };
 		4268733F16FDF4C100BBD539 /* QuickPostViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4268733E16FDF4C100BBD539 /* QuickPostViewController.m */; };
 		4268734316FDFB1400BBD539 /* QuickPostViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4268734216FDFB1400BBD539 /* QuickPostViewController.xib */; };
+		4268734916FE086A00BBD539 /* UIView+Entice.m in Sources */ = {isa = PBXBuildFile; fileRef = 4268734816FE086A00BBD539 /* UIView+Entice.m */; };
 		4526DC551148072F0090C99D /* Default-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = 4526DC531148072F0090C99D /* Default-Portrait.png */; };
 		4526DC561148072F0090C99D /* Default-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = 4526DC541148072F0090C99D /* Default-Landscape.png */; };
 		45C73C25113C36F70024D0D2 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 45C73C24113C36F70024D0D2 /* MainWindow-iPad.xib */; };
@@ -1014,6 +1015,8 @@
 		4268733D16FDF4C100BBD539 /* QuickPostViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuickPostViewController.h; sourceTree = "<group>"; };
 		4268733E16FDF4C100BBD539 /* QuickPostViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuickPostViewController.m; sourceTree = "<group>"; };
 		4268734216FDFB1400BBD539 /* QuickPostViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = QuickPostViewController.xib; path = Resources/QuickPostViewController.xib; sourceTree = "<group>"; };
+		4268734716FE086A00BBD539 /* UIView+Entice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Entice.h"; sourceTree = "<group>"; };
+		4268734816FE086A00BBD539 /* UIView+Entice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Entice.m"; sourceTree = "<group>"; };
 		4526DC531148072F0090C99D /* Default-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait.png"; sourceTree = "<group>"; };
 		4526DC541148072F0090C99D /* Default-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape.png"; sourceTree = "<group>"; };
 		45B71DE4113EDAA100D0A33C /* Entitlements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
@@ -2689,6 +2692,8 @@
 				FD75DDAC15B021C80043F12C /* UIViewController+Rotation.m */,
 				E1745A9815AF49C000A3F7C5 /* UIViewController+Styled.h */,
 				E1745A9915AF49C000A3F7C5 /* UIViewController+Styled.m */,
+				4268734716FE086A00BBD539 /* UIView+Entice.h */,
+				4268734816FE086A00BBD539 /* UIView+Entice.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -3842,6 +3847,7 @@
 				E1D0D84716D3D2EA00E33F4C /* PocketActivity.m in Sources */,
 				E15051CB16CA5DDB00D3DDDC /* Blog+Jetpack.m in Sources */,
 				4268733F16FDF4C100BBD539 /* QuickPostViewController.m in Sources */,
+				4268734916FE086A00BBD539 /* UIView+Entice.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

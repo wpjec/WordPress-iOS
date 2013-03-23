@@ -5,6 +5,7 @@
 #import "NSString+XMLExtensions.h"
 #import "WPPopoverBackgroundView.h"
 #import "WPAddCategoryViewController.h"
+#import "UIView+Entice.h"
 
 NSTimeInterval kAnimationDuration = 0.3f;
 
@@ -189,15 +190,7 @@ NSString *const EditPostViewControllerAutosaveDidFailNotification = @"EditPostVi
     textViewPlaceHolderField.frame = frame;
 	textViewPlaceHolderField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
 
-	CABasicAnimation *animateWiggleIt;
-	animateWiggleIt = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-	animateWiggleIt.duration = 0.5;
-	animateWiggleIt.repeatCount = 1;
-	animateWiggleIt.autoreverses = NO;
-    animateWiggleIt.fromValue = @0.75f;
-    animateWiggleIt.toValue = @1.f;
-	[textViewPlaceHolderField.layer addAnimation:animateWiggleIt forKey:@"placeholderWiggle"];
-
+    [textViewPlaceHolderField entice];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
