@@ -10,7 +10,7 @@
 
 @class SidebarViewController;
 
-@interface QuickPostViewController : UIViewController<UITextFieldDelegate>
+@interface QuickPostViewController : UIViewController<UITextFieldDelegate, UITextViewDelegate>
 
 @property (nonatomic, strong) IBOutlet UIButton *choosePhotoButton;
 @property (nonatomic, strong) IBOutlet UIButton *detailsButton;

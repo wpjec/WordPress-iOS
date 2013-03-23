@@ -7,17 +7,22 @@
 //
 
 #import "QuickPostViewController.h"
-#import "FileLogger.h"
+#import "Blog.h"
+#import "Post.h"
 #import "SidebarViewController.h"
 #import "UIView+Entice.h"
+#import "WordPressAppDelegate.h"
 
 @interface QuickPostViewController () {
+    WordPressAppDelegate *appDelegate;
     CGRect titleTextFieldFrame;
 }
 
-- (void) cancel;
-- (void) dismiss;
-- (void) post;
+- (void)cancel;
+- (void)checkPostButtonStatus;
+- (void)dismiss;
+- (void)post;
+- (Blog *)selectedBlog;
 
 @end
 
@@ -33,6 +38,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    appDelegate = [WordPressAppDelegate sharedWordPressApplicationDelegate];
 
     UIBarButtonItem *postButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Post", @"") style:UIBarButtonItemStyleDone target:self action:@selector(post)];
 
@@ -54,6 +61,30 @@
     [super didReceiveMemoryWarning];
 }
 
+#pragma mark - Implementation
+
+- (void)checkPostButtonStatus {
+    self.navigationItem.rightBarButtonItem.enabled = self.bodyTextView.text || self.titleTextField.text;
+}
+
+/**
+ * Trivial implementation for now, just returns the first blog, once blog selection is implemented this will change
+ */
+- (Blog *)selectedBlog {
+    NSManagedObjectContext *moc = [appDelegate managedObjectContext];
+
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Blog" inManagedObjectContext:moc]];
+
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"blogName" ascending:YES];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+
+    NSError *error = nil;
+    NSArray *results = [moc executeFetchRequest:fetchRequest error:&error];
+
+    return [results objectAtIndex:0];
+}
+
 #pragma mark - Nav Button Methods
 
 - (void) cancel {
@@ -65,7 +96,34 @@
 }
 
 - (void) post {
-    [self dismiss];
+    Blog *blog = [self selectedBlog];
+    Post *post = [Post newDraftForBlog:blog];
+
+    post.postTitle = self.titleTextField.text;
+    post.content = self.bodyTextView.text;
+
+    if (appDelegate.connectionAvailable) {
+        appDelegate.isUploadingPost = YES;
+
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [post uploadWithSuccess:nil failure:nil];
+        });
+
+        [self dismiss];
+        // TODO: remove vestiges of QuickPhoto from sidebar view controller, change this to uploadQuickPost
+        [self.sidebarViewController uploadQuickPhoto:post];
+    } else {
+        [post save];
+        [self dismiss];
+
+        NSString *title = NSLocalizedString(@"Quick Post Failed", @"");
+        NSString *message = NSLocalizedString(@"The Internet connection appears to be offline. The post has been saved as a local draft, you can publish it later.", @"");
+        NSString *cancelButtonTitle = NSLocalizedString(@"OK", @"");
+
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:cancelButtonTitle otherButtonTitles:nil];
+
+        [alertView show];
+    }
 }
 
 #pragma mark - UITextFieldDelegate methods
@@ -94,6 +152,8 @@
         return;
     }
 
+    [self checkPostButtonStatus];
+
     [UIView animateWithDuration:0.3f animations:^{
         // TODO: This animation is wonky, need to investigate why
         self.titleTextField.frame = titleTextFieldFrame;
@@ -101,6 +161,16 @@
         self.choosePhotoButton.alpha = 1.0f;
         self.detailsButton.alpha = 1.0f;
     }];
+}
+
+#pragma mark - UITextViewDelegate methods
+
+- (void)textViewDidChange:(UITextView *)textView {
+    if (textView != self.bodyTextView) {
+        return;
+    }
+
+    [self checkPostButtonStatus];
 }
 
 @end
