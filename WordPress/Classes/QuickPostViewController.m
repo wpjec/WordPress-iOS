@@ -15,6 +15,7 @@
 
 @interface QuickPostViewController () {
     WordPressAppDelegate *appDelegate;
+    UIView *visibileContainerView;
     CGRect titleTextFieldFrame;
 }
 
@@ -23,6 +24,7 @@
 - (void)dismiss;
 - (void)post;
 - (Blog *)selectedBlog;
+- (void)swapContainerViewContentTo:(UIView *)toView;
 
 @end
 
@@ -48,6 +50,9 @@
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
 
     self.placeholderLabel.text = NSLocalizedString(@"Tap here to begin writing", @"Placeholder for the main body text. Should hint at tapping to enter text (not specifying body text).");
+
+    [self.view sendSubviewToBack:self.containerView];
+    visibileContainerView = self.bodyTextView;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -62,6 +67,14 @@
 }
 
 #pragma mark - Implementation
+
+- (IBAction)choosePhotoButtonTapped:(id)sender {
+    [self swapContainerViewContentTo:(visibileContainerView == self.photoSelectionMethodView ? self.bodyTextView : self.photoSelectionMethodView)];
+}
+
+- (IBAction)detailsButtonTapped:(id)sender {
+    [self swapContainerViewContentTo:(visibileContainerView == self.detailsTableView ? self.bodyTextView : self.detailsTableView)];
+}
 
 - (void)checkPostButtonStatus {
     self.navigationItem.rightBarButtonItem.enabled = self.bodyTextView.text || self.titleTextField.text;
@@ -83,6 +96,28 @@
     NSArray *results = [moc executeFetchRequest:fetchRequest error:&error];
 
     return [results objectAtIndex:0];
+}
+
+- (void)swapContainerViewContentTo:(UIView *)toView {
+    UIView *fromView = visibileContainerView;
+
+    [fromView resignFirstResponder];
+
+    [self.containerView addSubview:toView];
+    CGRect frame = self.containerView.bounds;
+    frame.origin.y -= frame.size.height;
+    toView.frame = frame;
+
+    [UIView transitionWithView:self.containerView duration:0.5f options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        CGRect frame = fromView.frame;
+        frame.origin.y = self.containerView.frame.size.height;
+
+        fromView.frame = frame;
+        toView.frame = self.containerView.bounds;
+    } completion:^(BOOL finished) {
+        [fromView removeFromSuperview];
+        visibileContainerView = toView;
+    }];
 }
 
 #pragma mark - Nav Button Methods
@@ -133,6 +168,8 @@
         return;
     }
 
+    [self swapContainerViewContentTo:self.bodyTextView];
+
     titleTextFieldFrame = self.titleTextField.frame;
 
     CGRect frame = self.titleTextField.frame;
@@ -172,5 +209,20 @@
 
     [self checkPostButtonStatus];
 }
+
+#pragma mark - UITableViewDataSource methods
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"MyCell"];
+    cell.textLabel.text = [NSString stringWithFormat:@"Cell #%d", indexPath.row];
+
+    return cell;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 3;
+}
+
+#pragma mark - UITableViewDelegate methods
 
 @end
