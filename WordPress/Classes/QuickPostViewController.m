@@ -13,15 +13,24 @@
 #import "UIView+Entice.h"
 #import "WordPressAppDelegate.h"
 
+typedef enum {
+    kAnimationDirectionUnknown = 0,
+    kAnimationDirectionSlideLeft,
+    kAnimationDirectionSlideRight,
+    kAnimationDirectionSlideUp,
+    kAnimationDirectionSlideDown
+} AnimationDirection;
+
 @interface QuickPostViewController () {
     WordPressAppDelegate *appDelegate;
-    UIView *visibleContainerView;
     CGRect titleTextFieldFrame;
+    UIView *visibleContainerSubView;
 }
 
 - (void)cancel;
 - (void)checkPostButtonStatus;
 - (void)dismiss;
+- (CGRect)offsetFrame:(CGRect)frame forAnimationDirection:(AnimationDirection)animationDirection reverse:(BOOL)reverse;
 - (void)post;
 - (Blog *)selectedBlog;
 - (void)swapContainerViewContentTo:(UIView *)toView;
@@ -52,7 +61,9 @@
     self.placeholderLabel.text = NSLocalizedString(@"Tap here to begin writing", @"Placeholder for the main body text. Should hint at tapping to enter text (not specifying body text).");
 
     [self.view sendSubviewToBack:self.containerView];
-    visibleContainerView = self.bodyTextView;
+    visibleContainerSubView = self.bodyTextView;
+
+    self.bodyTextView.backgroundColor = [UIColor redColor];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -69,15 +80,36 @@
 #pragma mark - Implementation
 
 - (IBAction)choosePhotoButtonTapped:(id)sender {
-    [self swapContainerViewContentTo:(visibleContainerView == self.photoSelectionMethodView ? self.bodyTextView : self.photoSelectionMethodView)];
+    [self swapContainerViewContentTo:(visibleContainerSubView == self.photoSelectionMethodView ? self.bodyTextView : self.photoSelectionMethodView)];
 }
 
 - (IBAction)detailsButtonTapped:(id)sender {
-    [self swapContainerViewContentTo:(visibleContainerView == self.detailsTableView ? self.bodyTextView : self.detailsTableView)];
+    [self swapContainerViewContentTo:(visibleContainerSubView == self.detailsTableView ? self.bodyTextView : self.detailsTableView)];
 }
 
 - (void)checkPostButtonStatus {
     self.navigationItem.rightBarButtonItem.enabled = self.bodyTextView.text || self.titleTextField.text;
+}
+
+- (CGRect)offsetFrame:(CGRect)frame forAnimationDirection:(AnimationDirection)animationDirection reverse:(BOOL)reverse {
+    switch (animationDirection) {
+        case kAnimationDirectionSlideDown :
+            frame.origin.y = (reverse ? frame.size.height : -frame.size.height);
+            break;
+        case kAnimationDirectionSlideLeft :
+            frame.origin.x = (reverse  ? -frame.size.width : frame.size.width);
+            break;
+        case kAnimationDirectionSlideRight :
+            frame.origin.x = (reverse ? frame.size.width : -frame.size.width);
+            break;
+        case kAnimationDirectionSlideUp :
+            frame.origin.y = (reverse ? -frame.size.height : frame.size.height);
+            break;
+        default :
+            break;
+    }
+
+    return frame;
 }
 
 /**
@@ -99,24 +131,39 @@
 }
 
 - (void)swapContainerViewContentTo:(UIView *)toView {
-    UIView *fromView = visibleContainerView;
+    UIView *fromView = visibleContainerSubView;
+
+    AnimationDirection animationDirection;
+
+    if (fromView == self.photoSelectionMethodView) {
+        if (toView == self.detailsTableView) {
+            animationDirection = kAnimationDirectionSlideLeft;
+        } else if (toView == self.bodyTextView) {
+            animationDirection = kAnimationDirectionSlideUp;
+        }
+    } else if (fromView == self.detailsTableView) {
+        if (toView == self.photoSelectionMethodView) {
+            animationDirection = kAnimationDirectionSlideRight;
+        } else if (toView == self.bodyTextView) {
+            animationDirection = kAnimationDirectionSlideUp;
+        }
+    } else if (fromView == self.bodyTextView) {
+        animationDirection = kAnimationDirectionSlideDown;
+    }
 
     [fromView resignFirstResponder];
 
     [self.containerView addSubview:toView];
-    CGRect frame = self.containerView.bounds;
-    frame.origin.y -= frame.size.height;
-    toView.frame = frame;
+    toView.frame = [self offsetFrame:self.containerView.bounds forAnimationDirection:animationDirection reverse:NO];
 
     [UIView transitionWithView:self.containerView duration:0.5f options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        CGRect frame = fromView.frame;
-        frame.origin.y = self.containerView.frame.size.height;
-
-        fromView.frame = frame;
+        fromView.frame = [self offsetFrame:fromView.frame forAnimationDirection:animationDirection reverse:YES];
         toView.frame = self.containerView.bounds;
     } completion:^(BOOL finished) {
+        fromView.frame = self.containerView.bounds;
         [fromView removeFromSuperview];
-        visibleContainerView = toView;
+        visibleContainerSubView = toView;
+        [toView becomeFirstResponder];
     }];
 }
 
