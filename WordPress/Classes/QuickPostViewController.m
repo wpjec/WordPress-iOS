@@ -15,7 +15,7 @@
 
 @interface QuickPostViewController () {
     WordPressAppDelegate *appDelegate;
-    UIView *visibileContainerView;
+    UIView *visibleContainerView;
     CGRect titleTextFieldFrame;
 }
 
@@ -52,7 +52,7 @@
     self.placeholderLabel.text = NSLocalizedString(@"Tap here to begin writing", @"Placeholder for the main body text. Should hint at tapping to enter text (not specifying body text).");
 
     [self.view sendSubviewToBack:self.containerView];
-    visibileContainerView = self.bodyTextView;
+    visibleContainerView = self.bodyTextView;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -69,11 +69,11 @@
 #pragma mark - Implementation
 
 - (IBAction)choosePhotoButtonTapped:(id)sender {
-    [self swapContainerViewContentTo:(visibileContainerView == self.photoSelectionMethodView ? self.bodyTextView : self.photoSelectionMethodView)];
+    [self swapContainerViewContentTo:(visibleContainerView == self.photoSelectionMethodView ? self.bodyTextView : self.photoSelectionMethodView)];
 }
 
 - (IBAction)detailsButtonTapped:(id)sender {
-    [self swapContainerViewContentTo:(visibileContainerView == self.detailsTableView ? self.bodyTextView : self.detailsTableView)];
+    [self swapContainerViewContentTo:(visibleContainerView == self.detailsTableView ? self.bodyTextView : self.detailsTableView)];
 }
 
 - (void)checkPostButtonStatus {
@@ -99,7 +99,7 @@
 }
 
 - (void)swapContainerViewContentTo:(UIView *)toView {
-    UIView *fromView = visibileContainerView;
+    UIView *fromView = visibleContainerView;
 
     [fromView resignFirstResponder];
 
@@ -116,7 +116,7 @@
         toView.frame = self.containerView.bounds;
     } completion:^(BOOL finished) {
         [fromView removeFromSuperview];
-        visibileContainerView = toView;
+        visibleContainerView = toView;
     }];
 }
 
