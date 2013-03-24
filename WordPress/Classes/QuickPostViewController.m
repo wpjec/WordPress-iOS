@@ -33,7 +33,7 @@ typedef enum {
 - (CGRect)offsetFrame:(CGRect)frame forAnimationDirection:(AnimationDirection)animationDirection reverse:(BOOL)reverse;
 - (void)post;
 - (Blog *)selectedBlog;
-- (void)swapContainerViewContentTo:(UIView *)toView;
+- (void)swapContainerViewContentTo:(UIView *)toView becomeResponder:(BOOL)becomeResponder;
 
 @end
 
@@ -62,8 +62,7 @@ typedef enum {
 
     [self.view sendSubviewToBack:self.containerView];
     visibleContainerSubView = self.bodyTextView;
-
-    self.bodyTextView.backgroundColor = [UIColor redColor];
+    [self.bodyTextView becomeFirstResponder];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -80,11 +79,13 @@ typedef enum {
 #pragma mark - Implementation
 
 - (IBAction)choosePhotoButtonTapped:(id)sender {
-    [self swapContainerViewContentTo:(visibleContainerSubView == self.photoSelectionMethodView ? self.bodyTextView : self.photoSelectionMethodView)];
+    UIView *toView = (visibleContainerSubView == self.photoSelectionMethodView ? self.bodyTextView : self.photoSelectionMethodView);
+    [self swapContainerViewContentTo:toView becomeResponder:YES];
 }
 
 - (IBAction)detailsButtonTapped:(id)sender {
-    [self swapContainerViewContentTo:(visibleContainerSubView == self.detailsTableView ? self.bodyTextView : self.detailsTableView)];
+    UIView *toView = (visibleContainerSubView == self.detailsTableView ? self.bodyTextView : self.detailsTableView);
+    [self swapContainerViewContentTo:toView becomeResponder:YES];
 }
 
 - (void)checkPostButtonStatus {
@@ -130,8 +131,11 @@ typedef enum {
     return [results objectAtIndex:0];
 }
 
-- (void)swapContainerViewContentTo:(UIView *)toView {
+- (void)swapContainerViewContentTo:(UIView *)toView becomeResponder:(BOOL)becomeResponder {
     UIView *fromView = visibleContainerSubView;
+    if (fromView == toView) {
+        return;
+    }
 
     AnimationDirection animationDirection;
 
@@ -163,7 +167,9 @@ typedef enum {
         fromView.frame = self.containerView.bounds;
         [fromView removeFromSuperview];
         visibleContainerSubView = toView;
-        [toView becomeFirstResponder];
+        if (becomeResponder) {
+            [toView becomeFirstResponder];
+        }
     }];
 }
 
@@ -215,7 +221,7 @@ typedef enum {
         return;
     }
 
-    [self swapContainerViewContentTo:self.bodyTextView];
+    [self swapContainerViewContentTo:self.bodyTextView becomeResponder:NO];
 
     titleTextFieldFrame = self.titleTextField.frame;
 
