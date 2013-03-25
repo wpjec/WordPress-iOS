@@ -23,13 +23,17 @@ typedef enum {
 
 @interface QuickPostViewController () {
     WordPressAppDelegate *appDelegate;
+    CGRect bodyTextFieldFrame;
     CGRect titleTextFieldFrame;
     UIView *visibleContainerSubView;
 }
 
+- (void)animateKeyboardForNotification:(NSNotification *)notification showing:(BOOL)showing;
 - (void)cancel;
 - (void)checkPostButtonStatus;
 - (void)dismiss;
+- (void)keyboardWillShow:(NSNotification *)notification;
+- (void)keyboardWillHide:(NSNotification *)notification;
 - (CGRect)offsetFrame:(CGRect)frame forAnimationDirection:(AnimationDirection)animationDirection reverse:(BOOL)reverse;
 - (void)post;
 - (Blog *)selectedBlog;
@@ -62,7 +66,11 @@ typedef enum {
 
     [self.view sendSubviewToBack:self.containerView];
     visibleContainerSubView = self.bodyTextView;
+    bodyTextFieldFrame = self.bodyTextView.frame;
     [self.bodyTextView becomeFirstResponder];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -212,6 +220,44 @@ typedef enum {
 
         [alertView show];
     }
+}
+
+#pragma mark - Keyboard management
+
+- (void)keyboardWillShow:(NSNotification *)notification {
+    [self animateKeyboardForNotification:notification showing:YES];
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification {
+    [self animateKeyboardForNotification:notification showing:NO];
+}
+
+- (void)animateKeyboardForNotification:(NSNotification *)notification showing:(BOOL)showing {
+    NSDictionary *keyboardInfo = [notification userInfo];
+
+    NSTimeInterval duration;
+    UIViewAnimationCurve curve;
+
+    [[keyboardInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&duration];
+    [[keyboardInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&curve];
+
+    CGRect originalKeyboardFrame = [[keyboardInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    CGRect keyboardFrame = [self.view convertRect:[self.view.window convertRect:originalKeyboardFrame fromWindow:nil] fromView:nil];
+
+    CGRect frame;
+    if (showing) {
+        frame = self.bodyTextView.frame;
+        CGRect convertedBodyFrame = [self.view convertRect:self.bodyTextView.frame fromView:self.containerView];
+        frame.size.height = keyboardFrame.origin.y - convertedBodyFrame.origin.y;
+    } else {
+        // restore the original frame
+        frame = bodyTextFieldFrame;
+    }
+
+    [UIView animateWithDuration:duration animations:^{
+        [UIView setAnimationCurve:curve];
+        self.bodyTextView.frame = frame;
+    }];
 }
 
 #pragma mark - UITextFieldDelegate methods
