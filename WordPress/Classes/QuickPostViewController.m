@@ -169,6 +169,11 @@ typedef enum {
     toView.frame = [self offsetFrame:self.containerView.bounds forAnimationDirection:animationDirection reverse:NO];
 
     [UIView transitionWithView:self.containerView duration:0.5f options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        // NOTE: there's actually an animation glitch if fromView was the body text view
+        //  because we're simultaneously animating the keyboard dismissal and the view transition.
+        //  However, because the background of the text view matches that of the container view, the glitch
+        //  is not noticeable. We could fix this by delaying this animation until the keyboard is done animating
+        //  but since there's no impact, I think it's preferable to not induce that extra delay
         fromView.frame = [self offsetFrame:fromView.frame forAnimationDirection:animationDirection reverse:YES];
         toView.frame = self.containerView.bounds;
     } completion:^(BOOL finished) {
