@@ -10,6 +10,7 @@
 #import "Blog.h"
 #import "Post.h"
 #import "SidebarViewController.h"
+#import "UIImageView+Gravatar.h"
 #import "UIView+Entice.h"
 #import "WordPressAppDelegate.h"
 
@@ -28,6 +29,7 @@ typedef enum {
     UIView *visibleContainerSubView;
 }
 
+@property (nonatomic, strong) IBOutlet UIImageView *blavatarImageView;
 @property (nonatomic, strong) IBOutlet UIButton *choosePhotoButton;
 @property (nonatomic, strong) IBOutlet UIView *containerView;
 @property (nonatomic, strong) IBOutlet UIButton *detailsButton;
@@ -81,6 +83,9 @@ typedef enum {
     bodyTextFieldFrame = self.bodyTextView.frame;
     [self.bodyTextView becomeFirstResponder];
 
+    Blog *selectedBlog = [self selectedBlog];
+    [self.blavatarImageView setImageWithBlavatarUrl:selectedBlog.blavatarUrl isWPcom:selectedBlog.isWPcom];
+    
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 }
@@ -161,13 +166,15 @@ typedef enum {
 
     if (fromView == self.photoSelectionMethodView) {
         if (toView == self.detailsTableView) {
-            animationDirection = kAnimationDirectionSlideLeft;
+//            animationDirection = kAnimationDirectionSlideLeft;
+            animationDirection = kAnimationDirectionSlideRight;
         } else if (toView == self.bodyTextView) {
             animationDirection = kAnimationDirectionSlideUp;
         }
     } else if (fromView == self.detailsTableView) {
         if (toView == self.photoSelectionMethodView) {
-            animationDirection = kAnimationDirectionSlideRight;
+//            animationDirection = kAnimationDirectionSlideRight;
+            animationDirection = kAnimationDirectionSlideLeft;
         } else if (toView == self.bodyTextView) {
             animationDirection = kAnimationDirectionSlideUp;
         }
