@@ -89,6 +89,11 @@ typedef enum {
     bodyTextFieldFrame = self.bodyTextView.frame;
     [self.bodyTextView becomeFirstResponder];
 
+    CGRect frame = self.detailsView.frame;
+    frame.origin.y = -frame.size.height;
+    self.detailsView.frame = frame;
+    [self.view addSubview:self.detailsView];
+
     Blog *selectedBlog = [self selectedBlog];
     [self.blavatarImageView setImageWithBlavatarUrl:selectedBlog.blavatarUrl isWPcom:selectedBlog.isWPcom];
     
