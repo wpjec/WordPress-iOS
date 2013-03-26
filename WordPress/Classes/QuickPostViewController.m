@@ -166,14 +166,12 @@ typedef enum {
 
     if (fromView == self.photoSelectionMethodView) {
         if (toView == self.detailsTableView) {
-//            animationDirection = kAnimationDirectionSlideLeft;
             animationDirection = kAnimationDirectionSlideRight;
         } else if (toView == self.bodyTextView) {
             animationDirection = kAnimationDirectionSlideUp;
         }
     } else if (fromView == self.detailsTableView) {
         if (toView == self.photoSelectionMethodView) {
-//            animationDirection = kAnimationDirectionSlideRight;
             animationDirection = kAnimationDirectionSlideLeft;
         } else if (toView == self.bodyTextView) {
             animationDirection = kAnimationDirectionSlideUp;
