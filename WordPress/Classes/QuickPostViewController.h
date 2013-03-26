@@ -10,7 +10,7 @@
 
 @class SidebarViewController;
 
-@interface QuickPostViewController : UIViewController<UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, UITextViewDelegate>
+@interface QuickPostViewController : UIViewController<UITextFieldDelegate, UITextViewDelegate>
 
 @property (nonatomic, weak) SidebarViewController *sidebarViewController;
 

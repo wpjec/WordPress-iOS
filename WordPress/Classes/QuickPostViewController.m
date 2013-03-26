@@ -33,7 +33,7 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet UIButton *choosePhotoButton;
 @property (nonatomic, strong) IBOutlet UIView *containerView;
 @property (nonatomic, strong) IBOutlet UIButton *detailsButton;
-@property (nonatomic, strong) IBOutlet UITableView *detailsTableView;
+@property (nonatomic, strong) IBOutlet UIView  *detailsView;
 @property (nonatomic, strong) IBOutlet UITextView *bodyTextView;
 @property (nonatomic, strong) IBOutlet UIView *photoSelectionMethodView;
 @property (nonatomic, strong) IBOutlet UILabel *placeholderLabel;
@@ -109,7 +109,7 @@ typedef enum {
 }
 
 - (IBAction)detailsButtonTapped:(id)sender {
-    UIView *toView = (visibleContainerSubView == self.detailsTableView ? self.bodyTextView : self.detailsTableView);
+    UIView *toView = (visibleContainerSubView == self.detailsView ? self.bodyTextView : self.detailsView);
     [self swapContainerViewContentTo:toView becomeResponder:YES];
 }
 
@@ -165,12 +165,12 @@ typedef enum {
     AnimationDirection animationDirection;
 
     if (fromView == self.photoSelectionMethodView) {
-        if (toView == self.detailsTableView) {
+        if (toView == self.detailsView) {
             animationDirection = kAnimationDirectionSlideRight;
         } else if (toView == self.bodyTextView) {
             animationDirection = kAnimationDirectionSlideUp;
         }
-    } else if (fromView == self.detailsTableView) {
+    } else if (fromView == self.detailsView) {
         if (toView == self.photoSelectionMethodView) {
             animationDirection = kAnimationDirectionSlideLeft;
         } else if (toView == self.bodyTextView) {
@@ -330,20 +330,5 @@ typedef enum {
 
     [self checkPostButtonStatus];
 }
-
-#pragma mark - UITableViewDataSource methods
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"MyCell"];
-    cell.textLabel.text = [NSString stringWithFormat:@"Cell #%d", indexPath.row];
-
-    return cell;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 3;
-}
-
-#pragma mark - UITableViewDelegate methods
 
 @end
