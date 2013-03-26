@@ -10,6 +10,7 @@
 
 @interface UIView (Entice)
 
+- (void)bounce:(CGFloat)height;
 - (void)entice;
 
 @end

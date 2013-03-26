@@ -25,21 +25,27 @@ typedef enum {
 @interface QuickPostViewController () {
     WordPressAppDelegate *appDelegate;
     CGRect bodyTextFieldFrame;
+    BOOL isDragged;
+    BOOL isDragging;
+    CGPoint dragStart;
     CGRect titleTextFieldFrame;
     UIView *visibleContainerSubView;
 }
 
 @property (nonatomic, strong) IBOutlet UIImageView *blavatarImageView;
+@property (nonatomic, strong) IBOutlet UITextView *bodyTextView;
 @property (nonatomic, strong) IBOutlet UIButton *choosePhotoButton;
 @property (nonatomic, strong) IBOutlet UIView *containerView;
 @property (nonatomic, strong) IBOutlet UIButton *detailsButton;
-@property (nonatomic, strong) IBOutlet UIView  *detailsView;
-@property (nonatomic, strong) IBOutlet UITextView *bodyTextView;
+@property (nonatomic, strong) IBOutlet UIView *detailsView;
+@property (nonatomic, strong) IBOutlet UIPanGestureRecognizer *panGesture;
 @property (nonatomic, strong) IBOutlet UIView *photoSelectionMethodView;
 @property (nonatomic, strong) IBOutlet UILabel *placeholderLabel;
 @property (nonatomic, strong) IBOutlet UITextField *titleTextField;
+@property (nonatomic, strong) IBOutlet UIView *titleView;
 
 - (IBAction)choosePhotoButtonTapped:(id)sender;
+- (IBAction)detailsButtonSwiped:(UIPanGestureRecognizer *)gesture;
 - (IBAction)detailsButtonTapped:(id)sender;
 
 - (void)animateKeyboardForNotification:(NSNotification *)notification showing:(BOOL)showing;
@@ -108,9 +114,55 @@ typedef enum {
     [self swapContainerViewContentTo:toView becomeResponder:YES];
 }
 
+- (void)finishDragInDirection:(UISwipeGestureRecognizerDirection)direction {
+    CGFloat finalY = (direction == UISwipeGestureRecognizerDirectionDown ? self.detailsView.frame.size.height : 0.0f);
+
+    [UIView animateWithDuration:0.1f animations:^{
+        CGRect frame = self.view.frame;
+        frame.origin.y = finalY;
+        self.view.frame = frame;
+    } completion:^(BOOL finished) {
+        isDragging = NO;
+        isDragged = (direction == UISwipeGestureRecognizerDirectionDown);
+        self.panGesture.enabled = YES;
+    }];
+}
+
+- (IBAction)detailsButtonSwiped:(UIPanGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateCancelled) {
+        isDragging = NO;
+        return;
+    }
+
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        dragStart = self.view.center;
+        isDragging = YES;
+    }
+
+    CGPoint translatedPoint = [gesture translationInView:self.view];
+    translatedPoint = CGPointMake(dragStart.x, dragStart.y + translatedPoint.y);
+    self.view.center = translatedPoint;
+
+    if (gesture.state == UIGestureRecognizerStateEnded) {
+        UISwipeGestureRecognizerDirection direction;
+        if (self.view.frame.origin.y <= 40.0f) {
+            direction = UISwipeGestureRecognizerDirectionUp;
+        } else if (self.view.frame.origin.y >= (self.detailsView.frame.size.height - 40.0f)) {
+            direction = UISwipeGestureRecognizerDirectionDown;
+        } else {
+            direction = (self.view.center.y > dragStart.y ? UISwipeGestureRecognizerDirectionDown : UISwipeGestureRecognizerDirectionUp);
+        }
+
+        [self finishDragInDirection:direction];
+    }
+}
+
 - (IBAction)detailsButtonTapped:(id)sender {
-    UIView *toView = (visibleContainerSubView == self.detailsView ? self.bodyTextView : self.detailsView);
-    [self swapContainerViewContentTo:toView becomeResponder:YES];
+    if (isDragging || isDragged) {
+        return;
+    }
+
+    [self.view bounce:-40];
 }
 
 - (void)checkPostButtonStatus {
