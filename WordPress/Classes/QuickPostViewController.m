@@ -32,12 +32,13 @@ typedef enum {
     UIView *visibleContainerSubView;
 }
 
-@property (nonatomic, strong) IBOutlet UIImageView *blavatarImageView;
+@property (nonatomic, strong) IBOutlet BlogSelectorButton *blogSelector;
 @property (nonatomic, strong) IBOutlet UITextView *bodyTextView;
 @property (nonatomic, strong) IBOutlet UIButton *choosePhotoButton;
 @property (nonatomic, strong) IBOutlet UIView *containerView;
 @property (nonatomic, strong) IBOutlet UIButton *detailsButton;
 @property (nonatomic, strong) IBOutlet UIView *detailsView;
+@property (nonatomic, strong) IBOutlet UIView *overflowView;
 @property (nonatomic, strong) IBOutlet UIPanGestureRecognizer *panGesture;
 @property (nonatomic, strong) IBOutlet UIView *photoSelectionMethodView;
 @property (nonatomic, strong) IBOutlet UILabel *placeholderLabel;
@@ -89,16 +90,15 @@ typedef enum {
     bodyTextFieldFrame = self.bodyTextView.frame;
     [self.bodyTextView becomeFirstResponder];
 
-    CGRect frame = self.detailsView.frame;
-    frame.origin.y = -frame.size.height;
-    self.detailsView.frame = frame;
-    [self.view addSubview:self.detailsView];
-
-    Blog *selectedBlog = [self selectedBlog];
-    [self.blavatarImageView setImageWithBlavatarUrl:selectedBlog.blavatarUrl isWPcom:selectedBlog.isWPcom];
+    self.blogSelector.delegate = self;
+    [self.blogSelector loadBlogsForType:BlogSelectorButtonTypeQuickPhoto];
     
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+
+    self.view.backgroundColor = [UIColor redColor];
+    self.overflowView.backgroundColor = [UIColor greenColor];
+    self.containerView.backgroundColor = [UIColor blueColor];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -120,12 +120,12 @@ typedef enum {
 }
 
 - (void)finishDragInDirection:(UISwipeGestureRecognizerDirection)direction {
-    CGFloat finalY = (direction == UISwipeGestureRecognizerDirectionDown ? self.detailsView.frame.size.height : 0.0f);
+    CGFloat finalY = (direction == UISwipeGestureRecognizerDirectionDown ? 0 : -self.detailsView.frame.size.height);
 
     [UIView animateWithDuration:0.1f animations:^{
-        CGRect frame = self.view.frame;
+        CGRect frame = self.overflowView.frame;
         frame.origin.y = finalY;
-        self.view.frame = frame;
+        self.overflowView.frame = frame;
     } completion:^(BOOL finished) {
         isDragging = NO;
         isDragged = (direction == UISwipeGestureRecognizerDirectionDown);
@@ -140,23 +140,27 @@ typedef enum {
     }
 
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        dragStart = self.view.center;
+        dragStart = self.overflowView.center;
         isDragging = YES;
     }
 
-    CGPoint translatedPoint = [gesture translationInView:self.view];
+    CGPoint translatedPoint = [gesture translationInView:self.overflowView];
     translatedPoint = CGPointMake(dragStart.x, dragStart.y + translatedPoint.y);
-    self.view.center = translatedPoint;
+    self.overflowView.center = translatedPoint;
 
     if (gesture.state == UIGestureRecognizerStateEnded) {
+        CGPoint relativePoint = [gesture locationInView:self.view];
+        CGFloat threshold = 80.0f;
+
         UISwipeGestureRecognizerDirection direction;
-        if (self.view.frame.origin.y <= 40.0f) {
+        if (relativePoint.y <= threshold) {
             direction = UISwipeGestureRecognizerDirectionUp;
-        } else if (self.view.frame.origin.y >= (self.detailsView.frame.size.height - 40.0f)) {
+        } else if (relativePoint.y >= (self.detailsView.frame.size.height - threshold)) {
             direction = UISwipeGestureRecognizerDirectionDown;
         } else {
-            direction = (self.view.center.y > dragStart.y ? UISwipeGestureRecognizerDirectionDown : UISwipeGestureRecognizerDirectionUp);
+            direction = (self.overflowView.center.y > dragStart.y ? UISwipeGestureRecognizerDirectionDown : UISwipeGestureRecognizerDirectionUp);
         }
+
 
         [self finishDragInDirection:direction];
     }
@@ -167,7 +171,7 @@ typedef enum {
         return;
     }
 
-    [self.view bounce:-40];
+    [self.view bounce:-40.0f];
 }
 
 - (void)checkPostButtonStatus {
@@ -386,6 +390,17 @@ typedef enum {
     }
 
     [self checkPostButtonStatus];
+}
+
+#pragma mark - BlogSelectorButtonDelegate
+
+- (UIView *)blogSelectorButtonContainerView {
+    return self.overflowView;
+}
+
+- (void)blogSelectorButtonWillBecomeActive:(BlogSelectorButton *)button {
+    [self.titleTextField resignFirstResponder];
+    [self.bodyTextView resignFirstResponder];
 }
 
 @end

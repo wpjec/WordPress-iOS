@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "BlogSelectorButton.h"
 
 @class SidebarViewController;
 
-@interface QuickPostViewController : UIViewController<UITextFieldDelegate, UITextViewDelegate>
+@interface QuickPostViewController : UIViewController<BlogSelectorButtonDelegate, UITextFieldDelegate, UITextViewDelegate>
 
 @property (nonatomic, weak) SidebarViewController *sidebarViewController;
 

@@ -11,11 +11,14 @@
 #import <QuartzCore/QuartzCore.h>
 #import "UIImageView+Gravatar.h"
 
-@interface BlogSelectorButton (PrivateMethods)
+@interface BlogSelectorButton ()
+
 - (void)tap;
+
 @end
 
 @implementation BlogSelectorButton
+
 @synthesize activeBlog;
 @synthesize delegate;
 
@@ -35,61 +38,49 @@
         active = NO;
         self.autoresizesSubviews = YES;
 
+        static const CGFloat padding = 10.0f;
+
+        CGRect postToFrame = self.bounds;
+        postToFrame.origin.x = padding;
+        postToFrame.size.width = 85.0f;// TODO: constrain for other languages
+        postToLabel = [[UILabel alloc] initWithFrame:postToFrame];
+        postToLabel.font = [UIFont systemFontOfSize:17.0f];
+        postToLabel.textColor = [UIColor blackColor];
+        [postToLabel setText:NSLocalizedString(@"Post to:", @"")];
+        [self addSubview:postToLabel];
+
         CGRect blavatarFrame = self.bounds;
         blavatarFrame.size.width = 36.0f;
         blavatarFrame.size.height = 36.0f;
-        blavatarFrame.origin.x += 8;
-        blavatarFrame.origin.y += 6;
+        blavatarFrame.origin.x += postToFrame.origin.x + postToFrame.size.width;
         blavatarImageView = [[UIImageView alloc] initWithFrame:blavatarFrame];
+        blavatarImageView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
         [self addSubview:blavatarImageView];
-        
-        CGRect postToFrame = self.bounds;
-        postToFrame.origin.x = blavatarFrame.size.width + 15;
-        postToFrame.origin.y = postToFrame.origin.y + 6;
-        postToFrame.size.width -= blavatarFrame.size.width + 10 + 50;
-        postToFrame.size.height = 18.0f;
-        postToLabel = [[UILabel alloc] initWithFrame:postToFrame];
-        postToLabel.font = [UIFont systemFontOfSize:15];
-        postToLabel.textColor = [UIColor grayColor];
-        [postToLabel setText: NSLocalizedString(@"Post to:", @"")];
-        [self addSubview:postToLabel];
-        
+
+        CGRect selectorImageFrame = self.bounds;
+        selectorImageFrame.size.width = 15.0f;
+        selectorImageFrame.origin.x = self.bounds.size.width - selectorImageFrame.size.width - padding;
+
         CGRect blogTitleFrame = self.bounds;
-        blogTitleFrame.origin.x = blavatarFrame.size.width + 15;
-        blogTitleFrame.origin.y = blogTitleFrame.origin.y + 21;
-        blogTitleFrame.size.width -= blavatarFrame.size.width + 10 + 50;
-        blogTitleFrame.size.height = 24.0f;
+        blogTitleFrame.origin.x = blavatarFrame.origin.x + blavatarFrame.size.width;
+        blogTitleFrame.size.width -= (postToFrame.size.width + blavatarFrame.size.width + selectorImageFrame.size.width) + (padding * 3);
         blogTitleLabel = [[UILabel alloc] initWithFrame:blogTitleFrame];
-        blogTitleLabel.font = [UIFont boldSystemFontOfSize:20];
+        blogTitleLabel.font = [UIFont systemFontOfSize:17];
         blogTitleLabel.numberOfLines = 1;
         blogTitleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [self addSubview:blogTitleLabel];
-        
-        CGRect selectorImageFrame = self.bounds;
-        selectorImageFrame.origin.x = selectorImageFrame.size.width - 40;
-        selectorImageFrame.size.width = 15;
+
         selectorImageView = [[UIImageView alloc] initWithFrame:selectorImageFrame];
         selectorImageView.contentMode = UIViewContentModeCenter;
         selectorImageView.image = [UIImage imageNamed:@"downArrow"];
         selectorImageView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
         [self addSubview:selectorImageView];
-        
+
         [self addTarget:self action:@selector(tap) forControlEvents:UIControlEventTouchUpInside];        
     }
-    
+
     return self;
 }
-
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
-    [FileLogger log:@"%@ %@", self, NSStringFromSelector(_cmd)];
-    [super drawRect:rect];
-}
-*/
 
 #pragma mark -
 #pragma mark Custom methods
@@ -160,15 +151,9 @@
     }
 }
 
-- (void)animationDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context {
-    if (!active) {
-        [selectorViewController.tableView removeFromSuperview];
-    }
-}
-
 - (void)tap {
     [FileLogger log:@"%@ %@", self, NSStringFromSelector(_cmd)];
-    active = ! active;
+    active = !active;
     
     if (self.delegate) {
         if (active) {
@@ -182,32 +167,52 @@
         }
     }
     
+    UIView *container;
+    if ([self.delegate respondsToSelector:@selector(blogSelectorButtonContainerView)]) {
+        container = [self.delegate blogSelectorButtonContainerView];
+    } else {
+        container = self;
+    }
+
     if (active) {
         normalFrame = self.frame;
-        // Setup selection view
-        CGRect selectionViewFrame = self.superview.bounds;
-        selectionViewFrame.origin.y += self.frame.size.height;
-        selectionViewFrame.size.height = 0; // setting the height to 0 will make iOS auto calculate the right height
-        if (selectorViewController == nil) {
+
+        CGRect selectionViewFrame = container.superview.bounds;
+        selectionViewFrame.origin.y += self.frame.origin.y + self.frame.size.height;
+        selectionViewFrame.size.height -= self.frame.size.height;
+        if (!selectorViewController) {
             selectorViewController = [[BlogSelectorViewController alloc] initWithStyle:UITableViewStylePlain];
             selectorViewController.selectedBlog = self.activeBlog;
             selectorViewController.delegate = self;
         }
-        [selectorViewController.view setFrame:selectionViewFrame];
-        [self addSubview:selectorViewController.view];
+        selectorViewController.view.frame = selectionViewFrame;
+        [container addSubview:selectorViewController.view];
+        selectorViewController.view.alpha = 0.0f;
     }
-    
-    [UIView beginAnimations:@"activation" context:nil];
-    [UIView setAnimationDidStopSelector:@selector(animationDidStop:finished:context:)];
-    [UIView setAnimationDuration:0.15];
-    if (active) {
-        self.frame = self.superview.bounds;
-        selectorImageView.transform = CGAffineTransformMakeRotation(M_PI);
-    } else {
-        self.frame = normalFrame;
-        selectorImageView.transform = CGAffineTransformMakeRotation(0);
-    }
-    [UIView commitAnimations];
+
+    [UIView animateWithDuration:0.15f animations:^{
+        if (active) {
+            CGRect frame = selectorViewController.view.frame;
+            frame.origin.y = self.frame.size.height;
+            selectorViewController.view.frame = frame;
+            selectorViewController.view.alpha = 1.0f;
+
+            self.frame = container.superview.bounds;
+            selectorImageView.transform = CGAffineTransformMakeRotation(M_PI);
+        } else {
+            self.frame = normalFrame;
+            selectorImageView.transform = CGAffineTransformMakeRotation(0);
+
+            CGRect frame = selectorViewController.view.frame;
+            frame.origin.y = self.frame.origin.y + self.frame.size.height;
+            selectorViewController.view.frame = frame;
+            selectorViewController.view.alpha = 0.0f;
+        }
+    } completion:^(BOOL finished) {
+        if (!active) {
+            [selectorViewController.view removeFromSuperview];
+        }
+    }];
     
     if (self.delegate) {
         if (active) {
@@ -223,6 +228,7 @@
 }
 
 #pragma mark - Blog Selector delegate
+
 - (void)blogSelectorViewController:(BlogSelectorViewController *)blogSelector didSelectBlog:(Blog *)blog {
     if (self.delegate && [self.delegate respondsToSelector:@selector(blogSelectorViewController:didSelectBlog:)]) {
         [self.delegate blogSelectorButton:self didSelectBlog:blog];

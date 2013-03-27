@@ -18,13 +18,18 @@ typedef enum {
 } BlogSelectorButtonType;
 
 @class BlogSelectorButton;
+
 @protocol BlogSelectorButtonDelegate <NSObject>
+
 @optional
+
 - (void)blogSelectorButtonWillBecomeActive:(BlogSelectorButton *)button;
 - (void)blogSelectorButtonDidBecomeActive:(BlogSelectorButton *)button;
 - (void)blogSelectorButtonWillBecomeInactive:(BlogSelectorButton *)button;
 - (void)blogSelectorButtonDidBecomeInactive:(BlogSelectorButton *)button;
 - (void)blogSelectorButton:(BlogSelectorButton *)button didSelectBlog:(Blog *)blog;
+- (UIView *)blogSelectorButtonContainerView;
+
 @end
 
 @interface BlogSelectorButton : UIButton<BlogSelectorViewControllerDelegate> {
