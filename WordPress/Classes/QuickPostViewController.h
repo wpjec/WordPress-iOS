@@ -11,7 +11,7 @@
 
 @class SidebarViewController;
 
-@interface QuickPostViewController : UIViewController<BlogSelectorButtonDelegate, UITextFieldDelegate, UITextViewDelegate>
+@interface QuickPostViewController : UIViewController<BlogSelectorButtonDelegate, UIActionSheetDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPopoverControllerDelegate, UITextFieldDelegate, UITextViewDelegate>
 
 @property (nonatomic, weak) SidebarViewController *sidebarViewController;
 

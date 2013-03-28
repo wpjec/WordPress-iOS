@@ -13,6 +13,7 @@
 #import "UIImageView+Gravatar.h"
 #import "UIView+Entice.h"
 #import "WordPressAppDelegate.h"
+#import "WPPopoverBackgroundView.h"
 
 typedef enum {
     kAnimationDirectionUnknown = 0,
@@ -56,6 +57,7 @@ typedef enum {
 - (void)keyboardWillHide:(NSNotification *)notification;
 - (void)post;
 - (Blog *)selectedBlog;
+- (void)showPhotoPicker:(UIImagePickerControllerSourceType)sourceType;
 
 @end
 
@@ -106,7 +108,9 @@ typedef enum {
 #pragma mark - Implementation
 
 - (IBAction)choosePhotoButtonTapped:(id)sender {
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"" delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", @"") destructiveButtonTitle:nil otherButtonTitles:NSLocalizedString(@"Add Photo from Library", @""),NSLocalizedString(@"Take Photo", @""), nil];
 
+    [actionSheet showInView:self.view];
 }
 
 - (void)finishDragInDirection:(UISwipeGestureRecognizerDirection)direction {
@@ -184,6 +188,27 @@ typedef enum {
     NSArray *results = [moc executeFetchRequest:fetchRequest error:&error];
 
     return [results objectAtIndex:0];
+}
+
+- (void)showPhotoPicker:(UIImagePickerControllerSourceType)sourceType {
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.sourceType = sourceType;
+    picker.mediaTypes = [NSArray arrayWithObject:(NSString *)kUTTypeImage];
+    picker.allowsEditing = NO;
+    picker.delegate = self;
+
+    if (IS_IPAD) {
+        UIPopoverController *popoverController = [[UIPopoverController alloc] initWithContentViewController:picker];
+        if ([popoverController respondsToSelector:@selector(popoverBackgroundViewClass)]) {
+            popoverController.popoverBackgroundViewClass = [WPPopoverBackgroundView class];
+        }
+        popoverController.delegate = self;
+        CGRect rect = CGRectMake((self.view.frame.size.width/2), 1.0f, 1.0f, 1.0f); // puts the arrow in the middle of the screen
+        [popoverController presentPopoverFromRect:rect inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    } else {
+        picker.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        [self presentModalViewController:picker animated:YES];
+    }
 }
 
 #pragma mark - Nav Button Methods
@@ -310,6 +335,22 @@ typedef enum {
     }
 
     [self checkPostButtonStatus];
+}
+
+#pragma mark - UIActionSheetDelegate
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == actionSheet.cancelButtonIndex) {
+        [self.bodyTextView becomeFirstResponder];
+        return;
+    }
+
+    [self showPhotoPicker:(buttonIndex == 0 ? UIImagePickerControllerSourceTypePhotoLibrary : UIImagePickerControllerSourceTypeCamera)];
+}
+
+- (void)willPresentActionSheet:(UIActionSheet *)actionSheet {
+    [self.titleTextField resignFirstResponder];
+    [self.bodyTextView resignFirstResponder];
 }
 
 #pragma mark - BlogSelectorButtonDelegate
