@@ -35,7 +35,6 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet BlogSelectorButton *blogSelector;
 @property (nonatomic, strong) IBOutlet UITextView *bodyTextView;
 @property (nonatomic, strong) IBOutlet UIButton *choosePhotoButton;
-@property (nonatomic, strong) IBOutlet UIView *containerView;
 @property (nonatomic, strong) IBOutlet UIButton *detailsButton;
 @property (nonatomic, strong) IBOutlet UIView *detailsView;
 @property (nonatomic, strong) IBOutlet UIView *overflowView;
@@ -55,10 +54,8 @@ typedef enum {
 - (void)dismiss;
 - (void)keyboardWillShow:(NSNotification *)notification;
 - (void)keyboardWillHide:(NSNotification *)notification;
-- (CGRect)offsetFrame:(CGRect)frame forAnimationDirection:(AnimationDirection)animationDirection reverse:(BOOL)reverse;
 - (void)post;
 - (Blog *)selectedBlog;
-- (void)swapContainerViewContentTo:(UIView *)toView becomeResponder:(BOOL)becomeResponder;
 
 @end
 
@@ -85,20 +82,14 @@ typedef enum {
 
     self.placeholderLabel.text = NSLocalizedString(@"Tap here to begin writing", @"Placeholder for the main body text. Should hint at tapping to enter text (not specifying body text).");
 
-    [self.view sendSubviewToBack:self.containerView];
-    visibleContainerSubView = self.bodyTextView;
     bodyTextFieldFrame = self.bodyTextView.frame;
     [self.bodyTextView becomeFirstResponder];
 
     self.blogSelector.delegate = self;
     [self.blogSelector loadBlogsForType:BlogSelectorButtonTypeQuickPhoto];
-    
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
-
-    self.view.backgroundColor = [UIColor redColor];
-    self.overflowView.backgroundColor = [UIColor greenColor];
-    self.containerView.backgroundColor = [UIColor blueColor];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -115,8 +106,7 @@ typedef enum {
 #pragma mark - Implementation
 
 - (IBAction)choosePhotoButtonTapped:(id)sender {
-    UIView *toView = (visibleContainerSubView == self.photoSelectionMethodView ? self.bodyTextView : self.photoSelectionMethodView);
-    [self swapContainerViewContentTo:toView becomeResponder:YES];
+
 }
 
 - (void)finishDragInDirection:(UISwipeGestureRecognizerDirection)direction {
@@ -178,27 +168,6 @@ typedef enum {
     self.navigationItem.rightBarButtonItem.enabled = self.bodyTextView.text || self.titleTextField.text;
 }
 
-- (CGRect)offsetFrame:(CGRect)frame forAnimationDirection:(AnimationDirection)animationDirection reverse:(BOOL)reverse {
-    switch (animationDirection) {
-        case kAnimationDirectionSlideDown :
-            frame.origin.y = (reverse ? frame.size.height : -frame.size.height);
-            break;
-        case kAnimationDirectionSlideLeft :
-            frame.origin.x = (reverse  ? -frame.size.width : frame.size.width);
-            break;
-        case kAnimationDirectionSlideRight :
-            frame.origin.x = (reverse ? frame.size.width : -frame.size.width);
-            break;
-        case kAnimationDirectionSlideUp :
-            frame.origin.y = (reverse ? -frame.size.height : frame.size.height);
-            break;
-        default :
-            break;
-    }
-
-    return frame;
-}
-
 /**
  * Trivial implementation for now, just returns the first blog, once blog selection is implemented this will change
  */
@@ -215,53 +184,6 @@ typedef enum {
     NSArray *results = [moc executeFetchRequest:fetchRequest error:&error];
 
     return [results objectAtIndex:0];
-}
-
-- (void)swapContainerViewContentTo:(UIView *)toView becomeResponder:(BOOL)becomeResponder {
-    UIView *fromView = visibleContainerSubView;
-    if (fromView == toView) {
-        return;
-    }
-
-    AnimationDirection animationDirection;
-
-    if (fromView == self.photoSelectionMethodView) {
-        if (toView == self.detailsView) {
-            animationDirection = kAnimationDirectionSlideRight;
-        } else if (toView == self.bodyTextView) {
-            animationDirection = kAnimationDirectionSlideUp;
-        }
-    } else if (fromView == self.detailsView) {
-        if (toView == self.photoSelectionMethodView) {
-            animationDirection = kAnimationDirectionSlideLeft;
-        } else if (toView == self.bodyTextView) {
-            animationDirection = kAnimationDirectionSlideUp;
-        }
-    } else if (fromView == self.bodyTextView) {
-        animationDirection = kAnimationDirectionSlideDown;
-    }
-
-    [fromView resignFirstResponder];
-
-    [self.containerView addSubview:toView];
-    toView.frame = [self offsetFrame:self.containerView.bounds forAnimationDirection:animationDirection reverse:NO];
-
-    [UIView transitionWithView:self.containerView duration:0.5f options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        // NOTE: there's actually an animation glitch if fromView was the body text view
-        //  because we're simultaneously animating the keyboard dismissal and the view transition.
-        //  However, because the background of the text view matches that of the container view, the glitch
-        //  is not noticeable. We could fix this by delaying this animation until the keyboard is done animating
-        //  but since there's no impact, I think it's preferable to not induce that extra delay
-        fromView.frame = [self offsetFrame:fromView.frame forAnimationDirection:animationDirection reverse:YES];
-        toView.frame = self.containerView.bounds;
-    } completion:^(BOOL finished) {
-        fromView.frame = self.containerView.bounds;
-        [fromView removeFromSuperview];
-        visibleContainerSubView = toView;
-        if (becomeResponder) {
-            [toView becomeFirstResponder];
-        }
-    }];
 }
 
 #pragma mark - Nav Button Methods
@@ -330,7 +252,7 @@ typedef enum {
     CGRect frame;
     if (showing) {
         frame = self.bodyTextView.frame;
-        CGRect convertedBodyFrame = [self.view convertRect:self.bodyTextView.frame fromView:self.containerView];
+        CGRect convertedBodyFrame = [self.view convertRect:self.bodyTextView.frame fromView:self.overflowView];
         frame.size.height = keyboardFrame.origin.y - convertedBodyFrame.origin.y;
     } else {
         // restore the original frame
@@ -349,8 +271,6 @@ typedef enum {
     if (textField != self.titleTextField) {
         return;
     }
-
-    [self swapContainerViewContentTo:self.bodyTextView becomeResponder:NO];
 
     titleTextFieldFrame = self.titleTextField.frame;
 
