@@ -341,7 +341,7 @@
 		5D27718E15A33A8500F4DCAA /* toolbar_unapprove@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D27717E15A33A8500F4DCAA /* toolbar_unapprove@2x.png */; };
 		5D27719115A3527200F4DCAA /* toolbar_write.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D27718F15A3527000F4DCAA /* toolbar_write.png */; };
 		5D27719215A3527200F4DCAA /* toolbar_write@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D27719015A3527100F4DCAA /* toolbar_write@2x.png */; };
-		5D2B80D11592447200161F6E /* QuickPhotoButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D2B80D01592447200161F6E /* QuickPhotoButtonView.m */; };
+		5D2B80D11592447200161F6E /* QuickPostButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D2B80D01592447200161F6E /* QuickPostButtonView.m */; };
 		5D3E334E15EEBB6B005FC6F2 /* ReachabilityUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D3E334D15EEBB6B005FC6F2 /* ReachabilityUtils.m */; };
 		5D4DE6EE167165060030518D /* icon_info_message.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D4DE6EC167165060030518D /* icon_info_message.png */; };
 		5D4DE6EF167165060030518D /* icon_info_message@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5D4DE6ED167165060030518D /* icon_info_message@2x.png */; };
@@ -1091,8 +1091,8 @@
 		5D27718F15A3527000F4DCAA /* toolbar_write.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = toolbar_write.png; path = Resources/Images/toolbar_write.png; sourceTree = "<group>"; };
 		5D27719015A3527100F4DCAA /* toolbar_write@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "toolbar_write@2x.png"; path = "Resources/Images/toolbar_write@2x.png"; sourceTree = "<group>"; };
 		5D2B043515E83800007E3422 /* SettingsViewControllerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewControllerDelegate.h; sourceTree = "<group>"; };
-		5D2B80CF1592447200161F6E /* QuickPhotoButtonView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuickPhotoButtonView.h; sourceTree = "<group>"; };
-		5D2B80D01592447200161F6E /* QuickPhotoButtonView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuickPhotoButtonView.m; sourceTree = "<group>"; };
+		5D2B80CF1592447200161F6E /* QuickPostButtonView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuickPostButtonView.h; sourceTree = "<group>"; };
+		5D2B80D01592447200161F6E /* QuickPostButtonView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuickPostButtonView.m; sourceTree = "<group>"; };
 		5D3E334C15EEBB6B005FC6F2 /* ReachabilityUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReachabilityUtils.h; sourceTree = "<group>"; };
 		5D3E334D15EEBB6B005FC6F2 /* ReachabilityUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReachabilityUtils.m; sourceTree = "<group>"; };
 		5D4DE6EC167165060030518D /* icon_info_message.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon_info_message.png; path = Resources/Images/icon_info_message.png; sourceTree = "<group>"; };
@@ -1695,8 +1695,8 @@
 				E13FA0DD134C6D33007DCDD0 /* BlogSelectorButton.m */,
 				E17BE25F134F5E4D00165C3D /* QuickPicturePreviewView.h */,
 				E17BE260134F5E4D00165C3D /* QuickPicturePreviewView.m */,
-				5D2B80CF1592447200161F6E /* QuickPhotoButtonView.h */,
-				5D2B80D01592447200161F6E /* QuickPhotoButtonView.m */,
+				5D2B80CF1592447200161F6E /* QuickPostButtonView.h */,
+				5D2B80D01592447200161F6E /* QuickPostButtonView.m */,
 				E1CAAE3513F413F00000C58D /* WPKeyboardToolbar.h */,
 				E1CAAE3613F413F00000C58D /* WPKeyboardToolbar.m */,
 				E1CAAE3813F4142E0000C58D /* WPKeyboardToolbarButtonItem.h */,
@@ -3829,7 +3829,7 @@
 				FDC528AC157E551100A3FD91 /* SidebarTableViewCell.m in Sources */,
 				FD4500D11580DF3600F2B0E6 /* UIColor+Helpers.m in Sources */,
 				5DC433311587C3600073CF07 /* PanelViewWrapper.m in Sources */,
-				5D2B80D11592447200161F6E /* QuickPhotoButtonView.m in Sources */,
+				5D2B80D11592447200161F6E /* QuickPostButtonView.m in Sources */,
 				CC6B3BE715A33E16005A4523 /* WPFriendFinderNudgeView.m in Sources */,
 				5D9832F015A78AB400A5E783 /* UINavigationBar+Styled.m in Sources */,
 				5D9832F315A78CCB00A5E783 /* UIToolbar+Styled.m in Sources */,

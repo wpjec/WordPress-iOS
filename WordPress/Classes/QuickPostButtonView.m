@@ -1,13 +1,13 @@
 //
-//  QuickPhotoButtonView.m
+//  QuickPostButtonView.m
 //  WordPress
 //
 //  Created by Eric Johnson on 6/19/12.
 //
 
-#import "QuickPhotoButtonView.h"
+#import "QuickPostButtonView.h"
 
-@interface QuickPhotoButtonView () {
+@interface QuickPostButtonView () {
     UILabel *label;
     UIActivityIndicatorView *spinner;
     UIButton *button;
@@ -23,7 +23,7 @@
 
 @end
 
-@implementation QuickPhotoButtonView
+@implementation QuickPostButtonView
 
 @synthesize label, spinner, button, delegate;
 
@@ -113,7 +113,7 @@
 
 - (void)handleButtonTapped:(id)sender {
     if (delegate) {
-        [delegate quickPhotoButtonViewTapped:self];
+        [delegate quickPostButtonViewTapped:self];
     }
 }
 

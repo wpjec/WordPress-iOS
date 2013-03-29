@@ -26,7 +26,7 @@
 #import "WelcomeViewController.h"
 #import "CameraPlusPickerManager.h"
 #import "QuickPhotoViewController.h"
-#import "QuickPhotoButtonView.h"
+#import "QuickPostButtonView.h"
 #import "CrashReportViewController.h"
 #import "NotificationsViewController.h"
 #import "SoundUtil.h"
@@ -41,8 +41,8 @@
 #define DEFAULT_ROW_HEIGHT 48
 #define NUM_ROWS 6
 
-@interface SidebarViewController () <NSFetchedResultsControllerDelegate, QuickPhotoButtonViewDelegate> {
-    QuickPhotoButtonView *quickPhotoButton;
+@interface SidebarViewController () <NSFetchedResultsControllerDelegate, QuickPostButtonViewDelegate> {
+    QuickPostButtonView *quickPhotoButton;
     UIActionSheet *quickPhotoActionSheet;
     BOOL selectionRestored;
     NSUInteger wantedSection;
@@ -51,7 +51,7 @@
 }
 
 @property (nonatomic, strong) Post *currentQuickPost;
-@property (nonatomic, strong) QuickPhotoButtonView *quickPhotoButton;
+@property (nonatomic, strong) QuickPostButtonView *quickPhotoButton;
 @property (nonatomic, strong) UIActionSheet *quickPhotoActionSheet;
 @property (nonatomic, strong) NSFetchedResultsController *resultsController;
 @property (nonatomic, weak) SectionInfo *openSection;
@@ -513,7 +513,7 @@ NSLog(@"%@", self.sectionInfoArray);
 
 #pragma mark - Quick Post Methods
 
-- (void) quickPhotoButtonViewTapped:(QuickPhotoButtonView *)sender {
+- (void) quickPhotoButtonViewTapped:(QuickPostButtonView *)sender {
     QuickPostViewController *quickPostViewController = [[QuickPostViewController alloc] init];
     quickPostViewController.sidebarViewController = self;
 
@@ -530,7 +530,7 @@ NSLog(@"%@", self.sectionInfoArray);
 
 #pragma mark - Quick Photo Methods
 
-- (void)quickPhotoButtonViewTappedOrig:(QuickPhotoButtonView *)sender {
+- (void)quickPhotoButtonViewTappedOrig:(QuickPostButtonView *)sender {
     [FileLogger log:@"%@ %@", self, NSStringFromSelector(_cmd)];
 
     if (quickPhotoActionSheet) {
@@ -676,7 +676,7 @@ NSLog(@"%@", self.sectionInfoArray);
     
     // Match the height and y of the settings Button.
     CGRect frame = CGRectMake(0.0f, settingsFrame.origin.y, buttonWidth, settingsFrame.size.height);
-    self.quickPhotoButton = [[QuickPhotoButtonView alloc] initWithFrame:frame];
+    self.quickPhotoButton = [[QuickPostButtonView alloc] initWithFrame:frame];
     quickPhotoButton.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
     quickPhotoButton.delegate = self;
     
