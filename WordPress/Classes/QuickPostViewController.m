@@ -48,6 +48,7 @@ typedef enum {
 @property (nonatomic, strong) UIImage *photo;
 @property (nonatomic, strong) IBOutlet QuickPicturePreviewView *photoPreview;
 @property (nonatomic, strong) IBOutlet UIPopoverController *popController;
+@property (nonatomic, strong) IBOutlet UITextField *tagsTextField;
 @property (nonatomic, strong) IBOutlet UITextField *titleTextField;
 @property (nonatomic, strong) IBOutlet UIView *titleView;
 
@@ -194,7 +195,6 @@ typedef enum {
             direction = (self.overflowView.center.y > dragStart.y ? UISwipeGestureRecognizerDirectionDown : UISwipeGestureRecognizerDirectionUp);
         }
 
-
         [self finishDragInDirection:direction];
     }
 }
@@ -321,6 +321,7 @@ typedef enum {
 
     post.postTitle = self.titleTextField.text;
     post.content = self.bodyTextView.text;
+    post.tags = self.tagsTextField.text;
 
     if (self.postType == QuickPostTypeText) {
         post.specialType = @"QuickPost";
