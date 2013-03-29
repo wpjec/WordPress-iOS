@@ -39,7 +39,6 @@ typedef enum {
 
 @property (nonatomic, strong) IBOutlet BlogSelectorButton *blogSelector;
 @property (nonatomic, strong) IBOutlet UITextView *bodyTextView;
-@property (nonatomic, strong) IBOutlet UIButton *choosePhotoButton;
 @property (nonatomic, strong) IBOutlet UIButton *detailsButton;
 @property (nonatomic, strong) IBOutlet UIView *detailsView;
 @property (nonatomic, strong) IBOutlet UIView *overflowView;
@@ -52,7 +51,6 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet UITextField *titleTextField;
 @property (nonatomic, strong) IBOutlet UIView *titleView;
 
-- (IBAction)choosePhotoButtonTapped:(id)sender;
 - (IBAction)detailsButtonSwiped:(UIPanGestureRecognizer *)gesture;
 - (IBAction)detailsButtonTapped:(id)sender;
 
@@ -146,12 +144,6 @@ typedef enum {
 }
 
 #pragma mark - Implementation
-
-- (IBAction)choosePhotoButtonTapped:(id)sender {
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"" delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", @"") destructiveButtonTitle:nil otherButtonTitles:NSLocalizedString(@"Add Photo from Library", @""),NSLocalizedString(@"Take Photo", @""), nil];
-
-    [actionSheet showInView:self.view];
-}
 
 - (void)finishDragInDirection:(UISwipeGestureRecognizerDirection)direction {
     CGFloat finalY = (direction == UISwipeGestureRecognizerDirectionDown ? 0 : -self.detailsView.frame.size.height);
@@ -422,7 +414,6 @@ typedef enum {
     frame.size.width = width;
 
     [UIView animateWithDuration:0.3f animations:^{
-        self.choosePhotoButton.alpha = 0.0f;
         self.detailsButton.alpha = 0.0f;
 
         self.titleTextField.frame = frame;
@@ -440,7 +431,6 @@ typedef enum {
         // TODO: This animation is wonky, need to investigate why
         self.titleTextField.frame = titleTextFieldFrame;
 
-        self.choosePhotoButton.alpha = 1.0f;
         self.detailsButton.alpha = 1.0f;
     }];
 }
