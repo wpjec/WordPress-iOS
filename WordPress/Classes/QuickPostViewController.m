@@ -33,7 +33,6 @@ typedef enum {
     BOOL isFirstView;
     CGPoint dragStart;
     Post *post;
-    CGRect titleTextFieldFrame;
     UIView *visibleContainerSubView;
 }
 
@@ -200,7 +199,7 @@ typedef enum {
 }
 
 - (void)checkPostButtonStatus {
-    self.navigationItem.rightBarButtonItem.enabled = self.bodyTextView.text || self.titleTextField.text;
+    self.navigationItem.rightBarButtonItem.enabled = self.bodyTextView.text || self.titleTextField.text || self.photo;
 }
 
 - (void)handleCameraPlusImages:(NSNotification *)notification {
@@ -407,16 +406,8 @@ typedef enum {
         return;
     }
 
-    titleTextFieldFrame = self.titleTextField.frame;
-
-    CGRect frame = self.titleTextField.frame;
-    CGFloat width = (self.view.bounds.size.width - (2 * frame.origin.x));
-    frame.size.width = width;
-
     [UIView animateWithDuration:0.3f animations:^{
         self.detailsButton.alpha = 0.0f;
-
-        self.titleTextField.frame = frame;
     }];
 }
 
@@ -428,9 +419,6 @@ typedef enum {
     [self checkPostButtonStatus];
 
     [UIView animateWithDuration:0.3f animations:^{
-        // TODO: This animation is wonky, need to investigate why
-        self.titleTextField.frame = titleTextFieldFrame;
-
         self.detailsButton.alpha = 1.0f;
     }];
 }

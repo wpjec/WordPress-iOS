@@ -250,7 +250,7 @@
 									<object class="IBUITextField" id="665611071">
 										<reference key="NSNextResponder" ref="131689330"/>
 										<int key="NSvFlags">290</int>
-										<string key="NSFrame">{{10, 5}, {232, 26}}</string>
+										<string key="NSFrame">{{10, 5}, {268, 26}}</string>
 										<reference key="NSSuperview" ref="131689330"/>
 										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="493827737"/>
@@ -821,15 +821,10 @@
 					<string key="className">QuickPostViewController</string>
 					<string key="superclassName">UIViewController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="choosePhotoButtonTapped:">id</string>
 						<string key="detailsButtonSwiped:">UIPanGestureRecognizer</string>
 						<string key="detailsButtonTapped:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="choosePhotoButtonTapped:">
-							<string key="name">choosePhotoButtonTapped:</string>
-							<string key="candidateClassName">id</string>
-						</object>
 						<object class="IBActionInfo" key="detailsButtonSwiped:">
 							<string key="name">detailsButtonSwiped:</string>
 							<string key="candidateClassName">UIPanGestureRecognizer</string>
@@ -842,7 +837,6 @@
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="blogSelector">BlogSelectorButton</string>
 						<string key="bodyTextView">UITextView</string>
-						<string key="choosePhotoButton">UIButton</string>
 						<string key="detailsButton">UIButton</string>
 						<string key="detailsView">UIView</string>
 						<string key="overflowView">UIView</string>
@@ -862,10 +856,6 @@
 						<object class="IBToOneOutletInfo" key="bodyTextView">
 							<string key="name">bodyTextView</string>
 							<string key="candidateClassName">UITextView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="choosePhotoButton">
-							<string key="name">choosePhotoButton</string>
-							<string key="candidateClassName">UIButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="detailsButton">
 							<string key="name">detailsButton</string>
