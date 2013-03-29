@@ -406,6 +406,10 @@ typedef enum {
         return;
     }
 
+    if (isDragged) {
+        [self finishDragInDirection:UISwipeGestureRecognizerDirectionUp];
+    }
+
     [UIView animateWithDuration:0.3f animations:^{
         self.detailsButton.alpha = 0.0f;
     }];
