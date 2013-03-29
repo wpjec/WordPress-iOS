@@ -140,7 +140,6 @@
 										</object>
 										<float key="IBUIMinimumFontSize">16</float>
 										<object class="IBUITextInputTraits" key="IBUITextInputTraits">
-											<int key="IBUIAutocapitalizationType">2</int>
 											<int key="IBUIReturnKeyType">9</int>
 											<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 										</object>
@@ -392,7 +391,6 @@
 								<string key="NSFrame">{{190, 168}, {130, 420}}</string>
 								<reference key="NSSuperview" ref="99848884"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<object class="NSColor" key="IBUIBackgroundColor">
 									<int key="NSColorSpace">3</int>
