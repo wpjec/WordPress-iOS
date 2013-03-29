@@ -429,22 +429,6 @@ typedef enum {
     [self checkPostButtonStatus];
 }
 
-#pragma mark - UIActionSheetDelegate methods
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if (buttonIndex == actionSheet.cancelButtonIndex) {
-        [self.bodyTextView becomeFirstResponder];
-        return;
-    }
-
-    [self showPhotoPicker:(buttonIndex == 0 ? UIImagePickerControllerSourceTypePhotoLibrary : UIImagePickerControllerSourceTypeCamera)];
-}
-
-- (void)willPresentActionSheet:(UIActionSheet *)actionSheet {
-    [self.titleTextField resignFirstResponder];
-    [self.bodyTextView resignFirstResponder];
-}
-
 #pragma mark - BlogSelectorButtonDelegate methods
 
 - (UIView *)blogSelectorButtonContainerView {

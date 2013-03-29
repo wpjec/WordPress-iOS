@@ -18,7 +18,7 @@ typedef enum {
 
 @class SidebarViewController;
 
-@interface QuickPostViewController : UIViewController<BlogSelectorButtonDelegate, UIActionSheetDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPopoverControllerDelegate, UITextFieldDelegate, UITextViewDelegate>
+@interface QuickPostViewController : UIViewController<BlogSelectorButtonDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPopoverControllerDelegate, UITextFieldDelegate, UITextViewDelegate>
 
 @property (nonatomic, assign) QuickPostImageSourceType imageSourceType;
 @property (nonatomic, weak) SidebarViewController *sidebarViewController;
