@@ -30,7 +30,7 @@
 - (void)showCommentWithId:(NSNumber *)itemId blogId:(NSNumber *)blogId;
 - (void)selectNotificationsRow;
 
-- (void)uploadQuickPhoto:(Post *)post;
+- (void)uploadQuickPost:(Post *)post;
 - (void)restorePreservedSelection;
 - (void)didReceiveUnseenNotesNotification;
 

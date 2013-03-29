@@ -41,6 +41,14 @@
 #define DEFAULT_ROW_HEIGHT 48
 #define NUM_ROWS 6
 
+typedef enum {
+    QuickPostActionSheetButtonsTextPost                     = 1 << 0,
+    QuickPostActionSheetButtonsPhotoFromLibrary             = 1 << 1,
+    QuickPostActionSheetButtonsTakePhoto                    = 1 << 2,
+    QuickPostActionSheetButtonsPhotoFromCameraPlusLibrary   = 1 << 3,
+    QuickPostActionSheetButtonsTakePhotoWithCameraPlus      = 1 << 4,
+} QuickPostActionSheetButtons;
+
 @interface SidebarViewController () <NSFetchedResultsControllerDelegate, QuickPostButtonViewDelegate> {
     QuickPostButtonView *quickPostButton;
     UIActionSheet *quickPostActionSheet;
@@ -48,6 +56,7 @@
     NSUInteger wantedSection;
     BOOL _showingWelcomeScreen;
     BOOL changingContentForSelectedSection;
+    NSDictionary *quickPostButtonIndexes;
 }
 
 @property (nonatomic, strong) Post *currentQuickPost;
@@ -70,15 +79,13 @@
 - (void)selectBlogWithSection:(NSUInteger)index;
 - (void)selectBlog:(Blog *)blog;
 
-- (void)showQuickPhoto:(UIImagePickerControllerSourceType)sourceType useCameraPlus:(BOOL)useCameraPlus withImage:(UIImage *)image;
-- (void)showQuickPhoto:(UIImagePickerControllerSourceType)sourceType useCameraPlus:(BOOL)useCameraPlus;
-- (void)showQuickPhoto:(UIImagePickerControllerSourceType)sourceType;
+- (NSDictionary *)buttonTitlesForQuickPostActionSheetButtons:(QuickPostActionSheetButtons)buttons;
+- (void)showQuickPostForType:(QuickPostType)postType imageSourceType:(UIImagePickerControllerSourceType)imageSourceType useCameraPlus:(BOOL)useCameraPlus;
 - (void)postDidUploadSuccessfully:(NSNotification *)notification;
 - (void)postUploadFailed:(NSNotification *)notification;
 - (void)postUploadCancelled:(NSNotification *)notification;
 - (void)setupQuickPostButton;
 - (void)tearDownQuickPhotoButton;
-- (void)handleCameraPlusImages:(NSNotification *)notification;
 - (void)presentContent;
 - (void)checkNothingToShow;
 - (void)handleCrashReport;
@@ -155,7 +162,6 @@
     };
     [[NSNotificationCenter defaultCenter] addObserverForName:WordPressComApiDidLoginNotification object:nil queue:nil usingBlock:wpcomNotificationBlock];
     [[NSNotificationCenter defaultCenter] addObserverForName:WordPressComApiDidLogoutNotification object:nil queue:nil usingBlock:wpcomNotificationBlock];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleCameraPlusImages:) name:kCameraPlusImagesNotification object:nil];
     //Crash Report Notification
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissCrashReporter:) name:@"CrashReporterIsFinished" object:nil];
     
@@ -513,10 +519,90 @@ NSLog(@"%@", self.sectionInfoArray);
 
 #pragma mark - Quick Post Methods
 
-- (void) quickPostButtonViewTapped:(QuickPostButtonView *)sender {
-    QuickPostViewController *quickPostViewController = [[QuickPostViewController alloc] init];
-    quickPostViewController.sidebarViewController = self;
+- (NSDictionary *)buttonTitlesForQuickPostActionSheetButtons:(QuickPostActionSheetButtons)buttons {
+    NSMutableDictionary *buttonTitles = [[NSMutableDictionary alloc] init];
 
+    if ((buttons & QuickPostActionSheetButtonsTextPost) > 0) {
+        [buttonTitles setObject:[NSNumber numberWithInteger:QuickPostActionSheetButtonsTextPost] forKey:NSLocalizedString(@"Text Post", @"")];
+    }
+
+    if ((buttons & QuickPostActionSheetButtonsPhotoFromLibrary) > 0) {
+        [buttonTitles setObject:[NSNumber numberWithInteger:QuickPostActionSheetButtonsPhotoFromLibrary] forKey:NSLocalizedString(@"Photo from Library", @"")];
+    }
+
+    if ((buttons & QuickPostActionSheetButtonsTakePhoto) > 0) {
+        [buttonTitles setObject:[NSNumber numberWithInteger:QuickPostActionSheetButtonsTakePhoto] forKey:NSLocalizedString(@"Take Photo", @"")];
+    }
+
+    if ((buttons & QuickPostActionSheetButtonsPhotoFromCameraPlusLibrary) > 0) {
+        [buttonTitles setObject:[NSNumber numberWithInteger:QuickPostActionSheetButtonsPhotoFromCameraPlusLibrary] forKey:NSLocalizedString(@"Photo from Camera+", @"")];
+    }
+
+    if ((buttons & QuickPostActionSheetButtonsTakePhotoWithCameraPlus) > 0) {
+        [buttonTitles setObject:[NSNumber numberWithInteger:QuickPostActionSheetButtonsTakePhotoWithCameraPlus] forKey:NSLocalizedString(@"Take Photo with Camera+", @"")];
+    }
+
+    return [NSDictionary dictionaryWithDictionary:buttonTitles];
+}
+
+
+- (void)quickPostButtonViewTapped:(QuickPostButtonView *)sender {
+    [FileLogger log:@"%@ %@", self, NSStringFromSelector(_cmd)];
+
+    if (quickPostActionSheet) {
+        // Dismiss the previous action sheet without invoking a button click.
+        [quickPostActionSheet dismissWithClickedButtonIndex:-1 animated:NO];
+    }
+
+    [self.panelNavigationController showSidebar];
+
+    NSString *title = NSLocalizedString(@"What kind of post?", @"Quick Post action sheet title");
+    NSString *cancelButtonTitle = NSLocalizedString(@"Cancel", @"");
+
+    QuickPostActionSheetButtons buttons;
+
+    NSMutableDictionary *buttonIndexes = [[NSMutableDictionary alloc] init];
+
+	UIActionSheet *actionSheet = nil;
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        if ([[CameraPlusPickerManager sharedManager] cameraPlusPickerAvailable]) {
+            buttons = QuickPostActionSheetButtonsTextPost | QuickPostActionSheetButtonsPhotoFromLibrary | QuickPostActionSheetButtonsTakePhoto | QuickPostActionSheetButtonsPhotoFromCameraPlusLibrary | QuickPostActionSheetButtonsTakePhotoWithCameraPlus;
+        } else {
+            buttons = QuickPostActionSheetButtonsTextPost | QuickPostActionSheetButtonsPhotoFromLibrary | QuickPostActionSheetButtonsTakePhoto;
+        }
+	} else {
+        if ([[CameraPlusPickerManager sharedManager] cameraPlusPickerAvailable]) {
+            buttons = QuickPostActionSheetButtonsTextPost | QuickPostActionSheetButtonsPhotoFromLibrary | QuickPostActionSheetButtonsPhotoFromCameraPlusLibrary;
+        } else {
+            buttons = QuickPostActionSheetButtonsTextPost | QuickPostActionSheetButtonsPhotoFromLibrary;
+        }
+	}
+
+    actionSheet = [[UIActionSheet alloc] initWithTitle:title delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    NSDictionary *buttonTitles = [self buttonTitlesForQuickPostActionSheetButtons:buttons];
+
+    for (NSString *buttonTitle in buttonTitles) {
+        [buttonIndexes setObject:[buttonTitles objectForKey:buttonTitle] forKey:[NSNumber numberWithInteger:[actionSheet addButtonWithTitle:buttonTitle]]];
+    }
+
+    actionSheet.cancelButtonIndex = [actionSheet addButtonWithTitle:cancelButtonTitle];
+
+    quickPostButtonIndexes = [[NSDictionary alloc] initWithDictionary:buttonIndexes];
+
+    actionSheet.actionSheetStyle = UIActionSheetStyleDefault;
+    if (IS_IPAD) {
+        [actionSheet showFromRect:quickPostButton.frame inView:utililtyView animated:YES];
+    } else {
+        [actionSheet showInView:self.panelNavigationController.view];
+    }
+
+    self.quickPostActionSheet = actionSheet;
+}
+
+- (void)showQuickPostForType:(QuickPostType)postType imageSourceType:(UIImagePickerControllerSourceType)imageSourceType useCameraPlus:(BOOL)useCameraPlus {
+    QuickPostViewController *quickPostViewController = [[QuickPostViewController alloc] initWithPostType:postType imageSourceType:imageSourceType useCameraPlus:useCameraPlus];
+    quickPostViewController.sidebarViewController = self;
+    
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:quickPostViewController];
     if (IS_IPAD) {
         navController.modalPresentationStyle = UIModalPresentationFormSheet;
@@ -527,90 +613,7 @@ NSLog(@"%@", self.sectionInfoArray);
     }
 }
 
-
-#pragma mark - Quick Photo Methods
-
-- (void)quickPhotoButtonViewTappedOrig:(QuickPostButtonView *)sender {
-    [FileLogger log:@"%@ %@", self, NSStringFromSelector(_cmd)];
-
-    if (quickPostActionSheet) {
-        // Dismiss the previous action sheet without invoking a button click.
-        [quickPostActionSheet dismissWithClickedButtonIndex:-1 animated:NO];
-    }
-    
-    [self.panelNavigationController showSidebar];
-
-    
-
-	UIActionSheet *actionSheet = nil;
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        if ([[CameraPlusPickerManager sharedManager] cameraPlusPickerAvailable]) {
-            actionSheet = [[UIActionSheet alloc] initWithTitle:@"" 
-                                                      delegate:self 
-                                             cancelButtonTitle:NSLocalizedString(@"Cancel", @"") 
-                                        destructiveButtonTitle:nil 
-                                             otherButtonTitles:NSLocalizedString(@"Add Photo from Library", @""),NSLocalizedString(@"Take Photo", @""),NSLocalizedString(@"Add Photo from Camera+", @""), NSLocalizedString(@"Take Photo with Camera+", @""),nil];
-        } else {
-            actionSheet = [[UIActionSheet alloc] initWithTitle:@"" 
-                                                      delegate:self 
-                                             cancelButtonTitle:NSLocalizedString(@"Cancel", @"") 
-                                        destructiveButtonTitle:nil 
-                                             otherButtonTitles:NSLocalizedString(@"Add Photo from Library", @""),NSLocalizedString(@"Take Photo", @""),nil];            
-        }
-	} else {
-        [self showQuickPhoto:UIImagePickerControllerSourceTypePhotoLibrary useCameraPlus:NO withImage:nil];
-        return;
-	}
-    
-    actionSheet.actionSheetStyle = UIActionSheetStyleDefault;
-    if (IS_IPAD) {
-        [actionSheet showFromRect:quickPostButton.frame inView:utililtyView animated:YES];
-    } else {
-        [actionSheet showInView:self.panelNavigationController.view];        
-    }
-    self.quickPostActionSheet = actionSheet;
-    
-//    [appDelegate setAlertRunning:YES];
-}
-
-- (void)showQuickPhoto:(UIImagePickerControllerSourceType)sourceType {
-    [self showQuickPhoto:sourceType useCameraPlus:NO withImage:nil];
-}
-
-- (void)showQuickPhoto:(UIImagePickerControllerSourceType)sourceType useCameraPlus:(BOOL)useCameraPlus {
-    if (useCameraPlus) {
-        CameraPlusPickerManager *picker = [CameraPlusPickerManager sharedManager];
-        picker.callbackURLProtocol = @"wordpress";
-        picker.maxImages = 1;
-        picker.imageSize = 4096;
-        CameraPlusPickerMode mode = (sourceType == UIImagePickerControllerSourceTypeCamera) ? CameraPlusPickerModeShootOnly : CameraPlusPickerModeLightboxOnly;
-        [picker openCameraPlusPickerWithMode:mode];
-    } else {
-        [self showQuickPhoto:sourceType useCameraPlus:useCameraPlus withImage:nil];
-    }
-}
-
-- (void)showQuickPhoto:(UIImagePickerControllerSourceType)sourceType useCameraPlus:(BOOL)useCameraPlus withImage:(UIImage *)image {
-    QuickPhotoViewController *quickPhotoViewController = [[QuickPhotoViewController alloc] init];
-    quickPhotoViewController.sidebarViewController = self;
-    quickPhotoViewController.photo = image;
-    if (!image) {
-        quickPhotoViewController.sourceType = sourceType;
-    }
-    quickPhotoViewController.isCameraPlus = useCameraPlus;
-
-    
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:quickPhotoViewController];
-    if (IS_IPAD) {
-        navController.modalPresentationStyle = UIModalPresentationFormSheet;
-        navController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-        [self.panelNavigationController presentModalViewController:navController animated:YES];
-    } else {
-        [self.panelNavigationController presentModalViewController:navController animated:YES];
-    }
-}
-
-- (void)uploadQuickPhoto:(Post *)post {
+- (void)uploadQuickPost:(Post *)post {
     if (post != nil) {
         self.currentQuickPost = post;
         [quickPostButton showProgress:YES animated:YES];
@@ -697,25 +700,32 @@ NSLog(@"%@", self.sectionInfoArray);
     settingsButton.frame = frame;
 }
 
-- (void)handleCameraPlusImages:(NSNotification *)notification {
-    NSDictionary *userInfo = notification.userInfo;
-    UIImage *image = [userInfo objectForKey:@"image"];
-    // The source type isn't really important since we're also passing an image.
-    [self showQuickPhoto:UIImagePickerControllerSourceTypePhotoLibrary useCameraPlus:YES withImage:image];
-}
-
 #pragma mark - UIActionSheetDelegate
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     self.quickPostActionSheet = nil;
-    if(buttonIndex == 0) {
-        [self showQuickPhoto:UIImagePickerControllerSourceTypePhotoLibrary];
-    } else if(buttonIndex == 1) {
-        [self showQuickPhoto:UIImagePickerControllerSourceTypeCamera];
-    } else if(buttonIndex == 2) {
-        [self showQuickPhoto:UIImagePickerControllerSourceTypePhotoLibrary useCameraPlus:YES];
-    } else if(buttonIndex == 3) {
-        [self showQuickPhoto:UIImagePickerControllerSourceTypeCamera useCameraPlus:YES];
+
+    QuickPostActionSheetButtons button = [[quickPostButtonIndexes objectForKey:[NSNumber numberWithInteger:buttonIndex]] integerValue];
+
+    switch (button) {
+        case QuickPostActionSheetButtonsTextPost :
+            [self showQuickPostForType:QuickPostTypeText imageSourceType:nil useCameraPlus:NO];
+            break;
+        case QuickPostActionSheetButtonsPhotoFromLibrary :
+            [self showQuickPostForType:QuickPostTypePhoto imageSourceType:UIImagePickerControllerSourceTypePhotoLibrary useCameraPlus:NO];
+            break;
+        case QuickPostActionSheetButtonsTakePhoto :
+            [self showQuickPostForType:QuickPostTypePhoto imageSourceType:UIImagePickerControllerSourceTypeCamera useCameraPlus:NO];
+            break;
+        case QuickPostActionSheetButtonsPhotoFromCameraPlusLibrary :
+            [self showQuickPostForType:QuickPostTypePhoto imageSourceType:UIImagePickerControllerSourceTypePhotoLibrary useCameraPlus:YES];
+            break;
+        case QuickPostActionSheetButtonsTakePhotoWithCameraPlus :
+            [self showQuickPostForType:QuickPostTypePhoto imageSourceType:UIImagePickerControllerSourceTypeCamera useCameraPlus:YES];
+            break;
+        default :
+            WPFLog(@"Invalid button index for quick post action sheet: %d, available buttons were: %@", buttonIndex, quickPostButtonIndexes);
+            break;
     }
 }
 

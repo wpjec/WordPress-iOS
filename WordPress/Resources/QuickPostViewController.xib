@@ -829,8 +829,8 @@
 						<string key="detailsView">UIView</string>
 						<string key="overflowView">UIView</string>
 						<string key="panGesture">UIPanGestureRecognizer</string>
-						<string key="photoSelectionMethodView">UIView</string>
 						<string key="placeholderLabel">UILabel</string>
+						<string key="popoverController">UIPopoverController</string>
 						<string key="titleTextField">UITextField</string>
 						<string key="titleView">UIView</string>
 					</dictionary>
@@ -863,13 +863,13 @@
 							<string key="name">panGesture</string>
 							<string key="candidateClassName">UIPanGestureRecognizer</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="photoSelectionMethodView">
-							<string key="name">photoSelectionMethodView</string>
-							<string key="candidateClassName">UIView</string>
-						</object>
 						<object class="IBToOneOutletInfo" key="placeholderLabel">
 							<string key="name">placeholderLabel</string>
 							<string key="candidateClassName">UILabel</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="popoverController">
+							<string key="name">popoverController</string>
+							<string key="candidateClassName">UIPopoverController</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="titleTextField">
 							<string key="name">titleTextField</string>

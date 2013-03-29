@@ -8,7 +8,9 @@
 
 #import "QuickPostViewController.h"
 #import "Blog.h"
+#import "CameraPlusPickerManager.h"
 #import "Post.h"
+#import "QuickPicturePreviewView.h"
 #import "SidebarViewController.h"
 #import "UIImageView+Gravatar.h"
 #import "UIView+Entice.h"
@@ -28,7 +30,10 @@ typedef enum {
     CGRect bodyTextFieldFrame;
     BOOL isDragged;
     BOOL isDragging;
+    BOOL isFirstView;
     CGPoint dragStart;
+    QuickPicturePreviewView *photoPreview;
+    Post *post;
     CGRect titleTextFieldFrame;
     UIView *visibleContainerSubView;
 }
@@ -40,8 +45,9 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet UIView *detailsView;
 @property (nonatomic, strong) IBOutlet UIView *overflowView;
 @property (nonatomic, strong) IBOutlet UIPanGestureRecognizer *panGesture;
-@property (nonatomic, strong) IBOutlet UIView *photoSelectionMethodView;
 @property (nonatomic, strong) IBOutlet UILabel *placeholderLabel;
+@property (nonatomic, strong) UIImage *photo;
+@property (nonatomic, strong) IBOutlet UIPopoverController *popController;
 @property (nonatomic, strong) IBOutlet UITextField *titleTextField;
 @property (nonatomic, strong) IBOutlet UIView *titleView;
 
@@ -53,15 +59,26 @@ typedef enum {
 - (void)cancel;
 - (void)checkPostButtonStatus;
 - (void)dismiss;
+- (void)handleCameraPlusImages:(NSNotification *)notification;
 - (void)keyboardWillShow:(NSNotification *)notification;
 - (void)keyboardWillHide:(NSNotification *)notification;
 - (void)post;
-- (Blog *)selectedBlog;
 - (void)showPhotoPicker:(UIImagePickerControllerSourceType)sourceType;
 
 @end
 
 @implementation QuickPostViewController
+
+- (id)initWithPostType:(QuickPostType)postType imageSourceType:(UIImagePickerControllerSourceType)imageSourceType useCameraPlus:(BOOL)useCameraPlus {
+    self = [super initWithNibName:@"QuickPostViewController" bundle:nil];
+    if (self) {
+        self.postType = postType;
+        self.imageSourceType = imageSourceType;
+        self.useCameraPlus = useCameraPlus;
+    }
+
+    return self;
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -85,19 +102,32 @@ typedef enum {
     self.placeholderLabel.text = NSLocalizedString(@"Tap here to begin writing", @"Placeholder for the main body text. Should hint at tapping to enter text (not specifying body text).");
 
     bodyTextFieldFrame = self.bodyTextView.frame;
-    [self.bodyTextView becomeFirstResponder];
 
     self.blogSelector.delegate = self;
     [self.blogSelector loadBlogsForType:BlogSelectorButtonTypeQuickPhoto];
 
+    isFirstView = YES;
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleCameraPlusImages:) name:kCameraPlusImagesNotification object:nil];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    self.placeholderLabel.center = self.bodyTextView.center;
-
-    [self.placeholderLabel entice];
+- (void)viewDidAppear:(BOOL)animated {
+    if (isFirstView) {
+        isFirstView = NO;
+        switch (self.postType) {
+            case QuickPostTypePhoto :
+                [self showPhotoPicker:self.imageSourceType];
+                break;
+            case QuickPostTypeText :
+            default:
+                [self.bodyTextView becomeFirstResponder];
+                self.placeholderLabel.center = self.bodyTextView.center;
+                [self.placeholderLabel entice];
+                break;
+        }
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -172,48 +202,92 @@ typedef enum {
     self.navigationItem.rightBarButtonItem.enabled = self.bodyTextView.text || self.titleTextField.text;
 }
 
-/**
- * Trivial implementation for now, just returns the first blog, once blog selection is implemented this will change
- */
-- (Blog *)selectedBlog {
-    NSManagedObjectContext *moc = [appDelegate managedObjectContext];
+- (void)handleCameraPlusImages:(NSNotification *)notification {
+    self.photo = [notification.userInfo objectForKey:@"image"];
+}
 
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Blog" inManagedObjectContext:moc]];
+- (void)saveImage {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        if (self.imageSourceType == UIImagePickerControllerSourceTypeCamera) {
+            UIImageWriteToSavedPhotosAlbum(self.photo, nil, nil, nil);
+        }
 
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"blogName" ascending:YES];
-    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            Media *media = nil;
 
-    NSError *error = nil;
-    NSArray *results = [moc executeFetchRequest:fetchRequest error:&error];
+            Blog *blog = self.blogSelector.activeBlog;
+            if (!post) {
+                post = [Post newDraftForBlog:blog];
+            }
 
-    return [results objectAtIndex:0];
+            if (post.media && [post.media count] > 0) {
+                media = [post.media anyObject];
+            } else {
+                media = [Media newMediaForPost:post];
+                int resizePreference = 0;
+                if([[NSUserDefaults standardUserDefaults] objectForKey:@"media_resize_preference"]) {
+                    resizePreference = [[[NSUserDefaults standardUserDefaults] objectForKey:@"media_resize_preference"] intValue];
+                }
+
+                MediaResize newSize = kResizeLarge;
+                switch (resizePreference) {
+                    case 1:
+                        newSize = kResizeSmall;
+                        break;
+                    case 2:
+                        newSize = kResizeMedium;
+                        break;
+                    case 4:
+                        newSize = kResizeOriginal;
+                        break;
+                }
+
+                [media setImage:self.photo withSize:newSize];
+            }
+
+            [media save];
+            self.navigationItem.rightBarButtonItem.enabled = YES;
+        });
+    });
 }
 
 - (void)showPhotoPicker:(UIImagePickerControllerSourceType)sourceType {
-    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-    picker.sourceType = sourceType;
-    picker.mediaTypes = [NSArray arrayWithObject:(NSString *)kUTTypeImage];
-    picker.allowsEditing = NO;
-    picker.delegate = self;
-
-    if (IS_IPAD) {
-        UIPopoverController *popoverController = [[UIPopoverController alloc] initWithContentViewController:picker];
-        if ([popoverController respondsToSelector:@selector(popoverBackgroundViewClass)]) {
-            popoverController.popoverBackgroundViewClass = [WPPopoverBackgroundView class];
-        }
-        popoverController.delegate = self;
-        CGRect rect = CGRectMake((self.view.frame.size.width/2), 1.0f, 1.0f, 1.0f); // puts the arrow in the middle of the screen
-        [popoverController presentPopoverFromRect:rect inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    if (self.useCameraPlus) {
+        CameraPlusPickerManager *picker = [CameraPlusPickerManager sharedManager];
+        picker.callbackURLProtocol = @"wordpress";
+        picker.maxImages = 1;
+        picker.imageSize = 4096;
+        CameraPlusPickerMode mode = (sourceType == UIImagePickerControllerSourceTypeCamera) ? CameraPlusPickerModeShootOnly : CameraPlusPickerModeLightboxOnly;
+        [picker openCameraPlusPickerWithMode:mode];
     } else {
-        picker.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-        [self presentModalViewController:picker animated:YES];
+        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+        picker.sourceType = sourceType;
+        picker.mediaTypes = [NSArray arrayWithObject:(NSString *)kUTTypeImage];
+        picker.allowsEditing = NO;
+        picker.delegate = self;
+
+        if (IS_IPAD) {
+            self.popController = [[UIPopoverController alloc] initWithContentViewController:picker];
+            if ([self.popController respondsToSelector:@selector(popoverBackgroundViewClass)]) {
+                self.popController.popoverBackgroundViewClass = [WPPopoverBackgroundView class];
+            }
+            self.popController.delegate = self;
+            CGRect rect = CGRectMake((self.view.frame.size.width/2), 1.0f, 1.0f, 1.0f); // puts the arrow in the middle of the screen
+            [self.popController presentPopoverFromRect:rect inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        } else {
+            picker.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+            [self presentModalViewController:picker animated:YES];
+        }
     }
 }
 
 #pragma mark - Nav Button Methods
 
 - (void) cancel {
+    self.photo = nil;
+    if (post != nil) {
+        [post deletePostWithSuccess:nil failure:nil];
+    }
     [self dismiss];
 }
 
@@ -221,27 +295,61 @@ typedef enum {
     [self.sidebarViewController dismissModalViewControllerAnimated:YES];
 }
 
-- (void) post {
-    Blog *blog = [self selectedBlog];
-    Post *post = [Post newDraftForBlog:blog];
+- (void)post {
+    Media *media = nil;
+    Blog *blog = self.blogSelector.activeBlog;
+    BOOL isImagePost = (self.postType != QuickPostTypeText);
+
+    if (!post) {
+        post = [Post newDraftForBlog:blog];
+    } else {
+        post.blog = blog;
+        if (isImagePost) {
+            media = [post.media anyObject];
+            [media setBlog:blog];
+        }
+    }
 
     post.postTitle = self.titleTextField.text;
     post.content = self.bodyTextView.text;
 
-    if (appDelegate.connectionAvailable) {
+    if (self.postType == QuickPostTypeText) {
+        post.specialType = @"QuickPost";
+    } else {
+        post.postFormat = @"image";
+        if (self.useCameraPlus) {
+            post.specialType = @"QuickPhotoCameraPlus";
+        } else {
+            post.specialType = @"QuickPhoto";
+        }
+    }
+
+    if (appDelegate.connectionAvailable == YES ) {
+        if ([post.postFormat isEqualToString:@"image"]) {
+            [[NSNotificationCenter defaultCenter] addObserver:post selector:@selector(mediaDidUploadSuccessfully:) name:ImageUploadSuccessful object:media];
+            [[NSNotificationCenter defaultCenter] addObserver:post selector:@selector(mediaUploadFailed:) name:ImageUploadFailed object:media];
+        }
+
         appDelegate.isUploadingPost = YES;
 
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            [post uploadWithSuccess:nil failure:nil];
+            if (isImagePost) {
+                [media uploadWithSuccess:nil failure:nil];
+                [post save];
+            } else {
+                [post uploadWithSuccess:nil failure:nil];
+            }
         });
 
         [self dismiss];
-        // TODO: remove vestiges of QuickPhoto from sidebar view controller, change this to uploadQuickPost
-        [self.sidebarViewController uploadQuickPhoto:post];
+        [self.sidebarViewController uploadQuickPost:post];
     } else {
+        if (isImagePost) {
+            [media setRemoteStatus:MediaRemoteStatusFailed];
+        }
+
         [post save];
         [self dismiss];
-
         NSString *title = NSLocalizedString(@"Quick Post Failed", @"");
         NSString *message = NSLocalizedString(@"The Internet connection appears to be offline. The post has been saved as a local draft, you can publish it later.", @"");
         NSString *cancelButtonTitle = NSLocalizedString(@"OK", @"");
@@ -337,7 +445,7 @@ typedef enum {
     [self checkPostButtonStatus];
 }
 
-#pragma mark - UIActionSheetDelegate
+#pragma mark - UIActionSheetDelegate methods
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == actionSheet.cancelButtonIndex) {
@@ -353,7 +461,7 @@ typedef enum {
     [self.bodyTextView resignFirstResponder];
 }
 
-#pragma mark - BlogSelectorButtonDelegate
+#pragma mark - BlogSelectorButtonDelegate methods
 
 - (UIView *)blogSelectorButtonContainerView {
     return self.overflowView;
@@ -362,6 +470,51 @@ typedef enum {
 - (void)blogSelectorButtonWillBecomeActive:(BlogSelectorButton *)button {
     [self.titleTextField resignFirstResponder];
     [self.bodyTextView resignFirstResponder];
+}
+
+#pragma mark - UIPickerControllerDelegate methods
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    if (self.popController) {
+        [self.popController dismissPopoverAnimated:YES];
+        self.popController = nil;
+    }
+
+    self.photo = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
+    photoPreview.image = self.photo;
+
+    if (![self isViewLoaded]) {
+        // If we get a memory warning on the way here our view could have unloaded.
+        // In order to prevent a crash we'll make sure its loaded before
+        // dismissing the modal.
+        [self view];
+        [self.blogSelector loadBlogsForType:BlogSelectorButtonTypeQuickPhoto];
+        self.blogSelector.delegate = self;
+    }
+
+    [picker dismissModalViewControllerAnimated:NO];
+    [self saveImage];
+
+    [self.titleTextField performSelector:@selector(becomeFirstResponder) withObject:nil afterDelay:0.f];
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    picker.delegate = nil;
+    [self dismiss];
+}
+
+#pragma mark - Quick Photo preview view delegate
+
+- (void)pictureWillZoom {
+    [self.titleTextField resignFirstResponder];
+    [self.bodyTextView resignFirstResponder];
+    [self.view bringSubviewToFront:photoPreview];
+}
+
+#pragma mark - UIPopoverViewController Delegate methods
+
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
+    [self dismiss];
 }
 
 @end

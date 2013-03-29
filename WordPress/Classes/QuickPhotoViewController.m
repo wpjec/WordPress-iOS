@@ -241,7 +241,7 @@
         });
         
         [self dismiss];
-        [sidebarViewController uploadQuickPhoto:post];
+//        [sidebarViewController uploadQuickPhoto:post];
     } else {
         [media setRemoteStatus:MediaRemoteStatusFailed];
         [post save];
