@@ -80,7 +80,7 @@ typedef enum {
 - (void)selectBlog:(Blog *)blog;
 
 - (NSDictionary *)buttonTitlesForQuickPostActionSheetButtons:(QuickPostActionSheetButtons)buttons;
-- (void)showQuickPostForType:(QuickPostType)postType imageSourceType:(UIImagePickerControllerSourceType)imageSourceType useCameraPlus:(BOOL)useCameraPlus;
+- (void)showQuickPostForImageSourceType:(QuickPostImageSourceType)imageSourceType useCameraPlus:(BOOL)useCameraPlus;
 - (void)postDidUploadSuccessfully:(NSNotification *)notification;
 - (void)postUploadFailed:(NSNotification *)notification;
 - (void)postUploadCancelled:(NSNotification *)notification;
@@ -599,8 +599,8 @@ NSLog(@"%@", self.sectionInfoArray);
     self.quickPostActionSheet = actionSheet;
 }
 
-- (void)showQuickPostForType:(QuickPostType)postType imageSourceType:(UIImagePickerControllerSourceType)imageSourceType useCameraPlus:(BOOL)useCameraPlus {
-    QuickPostViewController *quickPostViewController = [[QuickPostViewController alloc] initWithPostType:postType imageSourceType:imageSourceType useCameraPlus:useCameraPlus];
+- (void)showQuickPostForImageSourceType:(QuickPostImageSourceType)imageSourceType useCameraPlus:(BOOL)useCameraPlus {
+    QuickPostViewController *quickPostViewController = [[QuickPostViewController alloc] initWithImageSourceType:imageSourceType useCameraPlus:useCameraPlus];
     quickPostViewController.sidebarViewController = self;
     
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:quickPostViewController];
@@ -709,19 +709,19 @@ NSLog(@"%@", self.sectionInfoArray);
 
     switch (button) {
         case QuickPostActionSheetButtonsTextPost :
-            [self showQuickPostForType:QuickPostTypeText imageSourceType:nil useCameraPlus:NO];
+            [self showQuickPostForImageSourceType:QuickPostImageSourceTypeNone useCameraPlus:NO];
             break;
         case QuickPostActionSheetButtonsPhotoFromLibrary :
-            [self showQuickPostForType:QuickPostTypePhoto imageSourceType:UIImagePickerControllerSourceTypePhotoLibrary useCameraPlus:NO];
+            [self showQuickPostForImageSourceType:QuickPostImageSourceTypePhotoLibrary useCameraPlus:NO];
             break;
         case QuickPostActionSheetButtonsTakePhoto :
-            [self showQuickPostForType:QuickPostTypePhoto imageSourceType:UIImagePickerControllerSourceTypeCamera useCameraPlus:NO];
+            [self showQuickPostForImageSourceType:QuickPostImageSourceTypeCamera useCameraPlus:NO];
             break;
         case QuickPostActionSheetButtonsPhotoFromCameraPlusLibrary :
-            [self showQuickPostForType:QuickPostTypePhoto imageSourceType:UIImagePickerControllerSourceTypePhotoLibrary useCameraPlus:YES];
+            [self showQuickPostForImageSourceType:QuickPostImageSourceTypePhotoLibrary useCameraPlus:YES];
             break;
         case QuickPostActionSheetButtonsTakePhotoWithCameraPlus :
-            [self showQuickPostForType:QuickPostTypePhoto imageSourceType:UIImagePickerControllerSourceTypeCamera useCameraPlus:YES];
+            [self showQuickPostForImageSourceType:QuickPostImageSourceTypeCamera useCameraPlus:YES];
             break;
         default :
             WPFLog(@"Invalid button index for quick post action sheet: %d, available buttons were: %@", buttonIndex, quickPostButtonIndexes);

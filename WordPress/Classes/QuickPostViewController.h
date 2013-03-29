@@ -10,20 +10,20 @@
 #import "BlogSelectorButton.h"
 
 typedef enum {
-    QuickPostTypeUnknown = 0,
-    QuickPostTypeText,
-    QuickPostTypePhoto
-} QuickPostType;
+    QuickPostImageSourceTypePhotoLibrary = UIImagePickerControllerSourceTypePhotoLibrary,
+    QuickPostImageSourceTypeCamera = UIImagePickerControllerSourceTypeCamera,
+    QuickPostImageSourceTypePhotosAlbum = UIImagePickerControllerSourceTypeSavedPhotosAlbum,
+    QuickPostImageSourceTypeNone
+} QuickPostImageSourceType;
 
 @class SidebarViewController;
 
 @interface QuickPostViewController : UIViewController<BlogSelectorButtonDelegate, UIActionSheetDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPopoverControllerDelegate, UITextFieldDelegate, UITextViewDelegate>
 
-@property (nonatomic, assign) UIImagePickerControllerSourceType imageSourceType;
-@property (nonatomic, assign) QuickPostType postType;
+@property (nonatomic, assign) QuickPostImageSourceType imageSourceType;
 @property (nonatomic, weak) SidebarViewController *sidebarViewController;
 @property (nonatomic, assign) BOOL useCameraPlus;
 
-- (id)initWithPostType:(QuickPostType)postType imageSourceType:(UIImagePickerControllerSourceType)imageSourceType useCameraPlus:(BOOL)useCameraPlus;
+- (id)initWithImageSourceType:(QuickPostImageSourceType)imageSourceType useCameraPlus:(BOOL)useCameraPlus;
 
 @end

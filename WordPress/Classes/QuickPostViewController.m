@@ -67,21 +67,11 @@ typedef enum {
 
 @implementation QuickPostViewController
 
-- (id)initWithPostType:(QuickPostType)postType imageSourceType:(UIImagePickerControllerSourceType)imageSourceType useCameraPlus:(BOOL)useCameraPlus {
+- (id)initWithImageSourceType:(QuickPostImageSourceType)imageSourceType useCameraPlus:(BOOL)useCameraPlus {
     self = [super initWithNibName:@"QuickPostViewController" bundle:nil];
     if (self) {
-        self.postType = postType;
         self.imageSourceType = imageSourceType;
         self.useCameraPlus = useCameraPlus;
-    }
-
-    return self;
-}
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        self.postType = QuickPostTypeText;
     }
 
     return self;
@@ -107,7 +97,7 @@ typedef enum {
 
     isFirstView = YES;
 
-    if (self.postType == QuickPostTypeText) {
+    if (self.imageSourceType == QuickPostImageSourceTypeNone) {
         self.photoPreview.hidden = YES;
     } else {
         CGRect frame = self.bodyTextView.frame;
@@ -123,11 +113,13 @@ typedef enum {
 - (void)viewDidAppear:(BOOL)animated {
     if (isFirstView) {
         isFirstView = NO;
-        switch (self.postType) {
-            case QuickPostTypePhoto :
+        switch (self.imageSourceType) {
+            case QuickPostImageSourceTypePhotoLibrary :
+            case QuickPostImageSourceTypeCamera :
+            case QuickPostImageSourceTypePhotosAlbum :
                 [self showPhotoPicker:self.imageSourceType];
                 break;
-            case QuickPostTypeText :
+            case QuickPostImageSourceTypeNone :
             default:
                 [self.bodyTextView becomeFirstResponder];
                 self.placeholderLabel.center = self.bodyTextView.center;
@@ -298,7 +290,7 @@ typedef enum {
 - (void)post {
     Media *media = nil;
     Blog *blog = self.blogSelector.activeBlog;
-    BOOL isImagePost = (self.postType != QuickPostTypeText);
+    BOOL isImagePost = (self.imageSourceType != QuickPostImageSourceTypeNone);
 
     if (!post) {
         post = [Post newDraftForBlog:blog];
@@ -314,15 +306,15 @@ typedef enum {
     post.content = self.bodyTextView.text;
     post.tags = self.tagsTextField.text;
 
-    if (self.postType == QuickPostTypeText) {
-        post.specialType = @"QuickPost";
-    } else {
+    if (isImagePost) {
         post.postFormat = @"image";
         if (self.useCameraPlus) {
             post.specialType = @"QuickPhotoCameraPlus";
         } else {
             post.specialType = @"QuickPhoto";
         }
+    } else {
+        post.specialType = @"QuickPost";
     }
 
     if (appDelegate.connectionAvailable == YES ) {
