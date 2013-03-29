@@ -42,8 +42,8 @@
 #define NUM_ROWS 6
 
 @interface SidebarViewController () <NSFetchedResultsControllerDelegate, QuickPostButtonViewDelegate> {
-    QuickPostButtonView *quickPhotoButton;
-    UIActionSheet *quickPhotoActionSheet;
+    QuickPostButtonView *quickPostButton;
+    UIActionSheet *quickPostActionSheet;
     BOOL selectionRestored;
     NSUInteger wantedSection;
     BOOL _showingWelcomeScreen;
@@ -51,8 +51,8 @@
 }
 
 @property (nonatomic, strong) Post *currentQuickPost;
-@property (nonatomic, strong) QuickPostButtonView *quickPhotoButton;
-@property (nonatomic, strong) UIActionSheet *quickPhotoActionSheet;
+@property (nonatomic, strong) QuickPostButtonView *quickPostButton;
+@property (nonatomic, strong) UIActionSheet *quickPostActionSheet;
 @property (nonatomic, strong) NSFetchedResultsController *resultsController;
 @property (nonatomic, weak) SectionInfo *openSection;
 @property (nonatomic, strong) NSMutableArray *sectionInfoArray;
@@ -76,7 +76,7 @@
 - (void)postDidUploadSuccessfully:(NSNotification *)notification;
 - (void)postUploadFailed:(NSNotification *)notification;
 - (void)postUploadCancelled:(NSNotification *)notification;
-- (void)setupQuickPhotoButton;
+- (void)setupQuickPostButton;
 - (void)tearDownQuickPhotoButton;
 - (void)handleCameraPlusImages:(NSNotification *)notification;
 - (void)presentContent;
@@ -89,11 +89,11 @@
 @implementation SidebarViewController
 
 @synthesize resultsController = _resultsController, openSection=_openSection, sectionInfoArray=_sectionInfoArray;
-@synthesize tableView, settingsButton, quickPhotoButton;
+@synthesize tableView, settingsButton, quickPostButton;
 @synthesize currentQuickPost = _currentQuickPost;
 @synthesize utililtyView;
 @synthesize currentIndexPath;
-@synthesize quickPhotoActionSheet;
+@synthesize quickPostActionSheet;
 
 - (void)dealloc {
     self.resultsController.delegate = nil;
@@ -142,7 +142,7 @@
     [settingsButton.titleLabel setTextAlignment:UITextAlignmentCenter];
 
     if ([[self.resultsController fetchedObjects] count] > 0) {
-        [self setupQuickPhotoButton];
+        [self setupQuickPostButton];
     }
     
     void (^wpcomNotificationBlock)(NSNotification *) = ^(NSNotification *note) {
@@ -179,9 +179,9 @@
     self.tableView = nil;
     self.settingsButton = nil;
     self.utililtyView = nil;
-    self.quickPhotoButton.delegate = nil;
-    self.quickPhotoButton = nil;
-    self.quickPhotoActionSheet = nil;
+    self.quickPostButton.delegate = nil;
+    self.quickPostButton = nil;
+    self.quickPostActionSheet = nil;
     
 //    self.sectionInfoArray = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -237,10 +237,10 @@
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
     [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-    if (quickPhotoActionSheet) {
+    if (quickPostActionSheet) {
         // The quickphoto actionsheet is showing but its location is probably off
         // due to the rotation. Just represent it.
-        [self quickPhotoButtonViewTapped:nil];
+        [self quickPostButtonViewTapped:nil];
     }
 }
 
@@ -513,7 +513,7 @@ NSLog(@"%@", self.sectionInfoArray);
 
 #pragma mark - Quick Post Methods
 
-- (void) quickPhotoButtonViewTapped:(QuickPostButtonView *)sender {
+- (void) quickPostButtonViewTapped:(QuickPostButtonView *)sender {
     QuickPostViewController *quickPostViewController = [[QuickPostViewController alloc] init];
     quickPostViewController.sidebarViewController = self;
 
@@ -533,9 +533,9 @@ NSLog(@"%@", self.sectionInfoArray);
 - (void)quickPhotoButtonViewTappedOrig:(QuickPostButtonView *)sender {
     [FileLogger log:@"%@ %@", self, NSStringFromSelector(_cmd)];
 
-    if (quickPhotoActionSheet) {
+    if (quickPostActionSheet) {
         // Dismiss the previous action sheet without invoking a button click.
-        [quickPhotoActionSheet dismissWithClickedButtonIndex:-1 animated:NO];
+        [quickPostActionSheet dismissWithClickedButtonIndex:-1 animated:NO];
     }
     
     [self.panelNavigationController showSidebar];
@@ -564,11 +564,11 @@ NSLog(@"%@", self.sectionInfoArray);
     
     actionSheet.actionSheetStyle = UIActionSheetStyleDefault;
     if (IS_IPAD) {
-        [actionSheet showFromRect:quickPhotoButton.frame inView:utililtyView animated:YES];
+        [actionSheet showFromRect:quickPostButton.frame inView:utililtyView animated:YES];
     } else {
         [actionSheet showInView:self.panelNavigationController.view];        
     }
-    self.quickPhotoActionSheet = actionSheet;
+    self.quickPostActionSheet = actionSheet;
     
 //    [appDelegate setAlertRunning:YES];
 }
@@ -613,7 +613,7 @@ NSLog(@"%@", self.sectionInfoArray);
 - (void)uploadQuickPhoto:(Post *)post {
     if (post != nil) {
         self.currentQuickPost = post;
-        [quickPhotoButton showProgress:YES animated:YES];
+        [quickPostButton showProgress:YES animated:YES];
         
         if (IS_IPHONE) {
             [self selectBlog:post.blog];
@@ -624,13 +624,13 @@ NSLog(@"%@", self.sectionInfoArray);
 - (void)postDidUploadSuccessfully:(NSNotification *)notification {
 //    appDelegate.isUploadingPost = NO;
     self.currentQuickPost = nil;
-    [quickPhotoButton showSuccess];
+    [quickPostButton showSuccess];
 }
 
 - (void)postUploadFailed:(NSNotification *)notification {
 //    appDelegate.isUploadingPost = NO;
     self.currentQuickPost = nil;
-    [quickPhotoButton showProgress:NO animated:YES];
+    [quickPostButton showProgress:NO animated:YES];
 
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Quick Photo Failed", @"")
                                                     message:NSLocalizedString(@"The photo could not be published. It's been saved as a local draft.", @"")
@@ -642,7 +642,7 @@ NSLog(@"%@", self.sectionInfoArray);
 
 - (void)postUploadCancelled:(NSNotification *)notification {
     self.currentQuickPost = nil;
-    [quickPhotoButton showProgress:NO animated:YES];
+    [quickPostButton showProgress:NO animated:YES];
 }
 
 - (void)setCurrentQuickPost:(Post *)currentQuickPost {
@@ -661,8 +661,8 @@ NSLog(@"%@", self.sectionInfoArray);
     }
 }
 
-- (void)setupQuickPhotoButton {    
-    if (quickPhotoButton) return;
+- (void)setupQuickPostButton {    
+    if (quickPostButton) return;
     
     CGFloat gapWidth = 2.0f;
     CGFloat availableWidth = self.view.frame.size.width;
@@ -676,19 +676,19 @@ NSLog(@"%@", self.sectionInfoArray);
     
     // Match the height and y of the settings Button.
     CGRect frame = CGRectMake(0.0f, settingsFrame.origin.y, buttonWidth, settingsFrame.size.height);
-    self.quickPhotoButton = [[QuickPostButtonView alloc] initWithFrame:frame];
-    quickPhotoButton.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
-    quickPhotoButton.delegate = self;
+    self.quickPostButton = [[QuickPostButtonView alloc] initWithFrame:frame];
+    quickPostButton.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
+    quickPostButton.delegate = self;
     
-    [self.utililtyView addSubview:quickPhotoButton];
+    [self.utililtyView addSubview:quickPostButton];
 }
 
 - (void)tearDownQuickPhotoButton {
-    if (!quickPhotoButton) return;
+    if (!quickPostButton) return;
 
-    [quickPhotoButton removeFromSuperview];
-    quickPhotoButton.delegate = nil;
-    self.quickPhotoButton = nil;
+    [quickPostButton removeFromSuperview];
+    quickPostButton.delegate = nil;
+    self.quickPostButton = nil;
     
     CGFloat availableWidth = self.view.frame.size.width;
     CGRect frame = settingsButton.frame;
@@ -707,7 +707,7 @@ NSLog(@"%@", self.sectionInfoArray);
 #pragma mark - UIActionSheetDelegate
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    self.quickPhotoActionSheet = nil;
+    self.quickPostActionSheet = nil;
     if(buttonIndex == 0) {
         [self showQuickPhoto:UIImagePickerControllerSourceTypePhotoLibrary];
     } else if(buttonIndex == 1) {
@@ -1166,7 +1166,7 @@ NSLog(@"%@", self.sectionInfoArray);
         [self selectFirstAvailableItem];
     }
     if([[self.resultsController fetchedObjects] count] > 0){
-        [self setupQuickPhotoButton];
+        [self setupQuickPostButton];
     } else {
         [self tearDownQuickPhotoButton];
     }
