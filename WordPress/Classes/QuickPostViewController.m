@@ -32,7 +32,6 @@ typedef enum {
     BOOL isDragging;
     BOOL isFirstView;
     CGPoint dragStart;
-    QuickPicturePreviewView *photoPreview;
     Post *post;
     CGRect titleTextFieldFrame;
     UIView *visibleContainerSubView;
@@ -47,6 +46,7 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet UIPanGestureRecognizer *panGesture;
 @property (nonatomic, strong) IBOutlet UILabel *placeholderLabel;
 @property (nonatomic, strong) UIImage *photo;
+@property (nonatomic, strong) IBOutlet QuickPicturePreviewView *photoPreview;
 @property (nonatomic, strong) IBOutlet UIPopoverController *popController;
 @property (nonatomic, strong) IBOutlet UITextField *titleTextField;
 @property (nonatomic, strong) IBOutlet UIView *titleView;
@@ -83,8 +83,9 @@ typedef enum {
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
+        self.postType = QuickPostTypeText;
     }
+
     return self;
 }
 
@@ -107,6 +108,14 @@ typedef enum {
     [self.blogSelector loadBlogsForType:BlogSelectorButtonTypeQuickPhoto];
 
     isFirstView = YES;
+
+    if (self.postType == QuickPostTypeText) {
+        self.photoPreview.hidden = YES;
+    } else {
+        CGRect frame = self.bodyTextView.frame;
+        frame.size.width = (self.view.frame.size.width - self.photoPreview.frame.size.width);
+        self.bodyTextView.frame = frame;
+    }
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
@@ -481,7 +490,7 @@ typedef enum {
     }
 
     self.photo = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
-    photoPreview.image = self.photo;
+    self.photoPreview.image = self.photo;
 
     if (![self isViewLoaded]) {
         // If we get a memory warning on the way here our view could have unloaded.
@@ -495,7 +504,7 @@ typedef enum {
     [picker dismissModalViewControllerAnimated:NO];
     [self saveImage];
 
-    [self.titleTextField performSelector:@selector(becomeFirstResponder) withObject:nil afterDelay:0.f];
+    [self.bodyTextView performSelector:@selector(becomeFirstResponder) withObject:nil afterDelay:0.f];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
@@ -508,7 +517,11 @@ typedef enum {
 - (void)pictureWillZoom {
     [self.titleTextField resignFirstResponder];
     [self.bodyTextView resignFirstResponder];
-    [self.view bringSubviewToFront:photoPreview];
+    [self.view bringSubviewToFront:self.photoPreview];
+}
+
+- (void)pictureWillRestore {
+    [self.bodyTextView becomeFirstResponder];
 }
 
 #pragma mark - UIPopoverViewController Delegate methods
