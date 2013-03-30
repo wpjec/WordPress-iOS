@@ -15,7 +15,9 @@
 #define kSelectionsCategoriesContext ((void *)2000)
 
 @interface WPCategorySelectionTableViewController ()<UIPopoverControllerDelegate> {
-    BOOL isNewCategory;
+    UIPopoverController *popover;
+    CGRect popoverRect;
+    UIView *popoverView;
 }
 
 @property (nonatomic, readonly) Blog *blog;
@@ -36,11 +38,19 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"navbar_add"] style:UIBarButtonItemStyleBordered target:self action:@selector(showAddNewCategoryView:)];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(categoryCreated:) name:WPNewCategoryCreatedAndUpdatedInBlogNotificationName object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceDidRotate:) name:@"UIDeviceOrientationDidChangeNotification" object:nil];
 }
 
 - (void)didReceiveMemoryWarning {
     WPFLogMethod();
     [super didReceiveMemoryWarning];
+}
+
+- (void)deviceDidRotate:(NSNotification *)notification {
+    if (popover) {
+        // Redisplay the popover to ensure it's in the correct location after rotation
+        [popover presentPopoverFromRect:popoverRect inView:popoverView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    }
 }
 
 #pragma mark - Public Implementation
@@ -65,12 +75,13 @@
         navController = [[UINavigationController alloc] initWithRootViewController:self];
     }
 
-    UIPopoverController *popover = [[UIPopoverController alloc] initWithContentViewController:navController];
-    popover.popoverBackgroundViewClass = [WPPopoverBackgroundView class];
+    popoverView = view;
+    popoverRect = rect;
 
+    popover = [[UIPopoverController alloc] initWithContentViewController:navController];
+    popover.popoverBackgroundViewClass = [WPPopoverBackgroundView class];
     popover.delegate = self;
 
-    popover.popoverContentSize = CGSizeMake(320.0f, 460.0f);
     [popover presentPopoverFromRect:rect inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
     [[CPopoverManager instance] setCurrentPopoverController:popover];
 }
