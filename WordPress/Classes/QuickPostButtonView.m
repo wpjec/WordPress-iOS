@@ -65,10 +65,10 @@
     [button.titleLabel setFont:[UIFont boldSystemFontOfSize:15.0f]];
     [button setBackgroundImage:[[UIImage imageNamed:@"SidebarToolbarButton"] stretchableImageWithLeftCapWidth:5.0 topCapHeight:0.0] forState:UIControlStateNormal];
     [button setBackgroundImage:[[UIImage imageNamed:@"SidebarToolbarButtonHighlighted"] stretchableImageWithLeftCapWidth:5.0 topCapHeight:0.0] forState:UIControlStateHighlighted];
-    [button setTitle:NSLocalizedString(@"Photo", @"") forState:UIControlStateNormal];
+    [button setTitle:NSLocalizedString(@"Quick Post", @"") forState:UIControlStateNormal];
     [button addTarget:self action:@selector(handleButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [button setBackgroundColor:[UIColor clearColor]];
-    [button setImage:[UIImage imageNamed:@"sidebar_camera"] forState:UIControlStateNormal];
+    [button setImage:[UIImage imageNamed:@"sidebar_quickpost"] forState:UIControlStateNormal];
     [button setTitleEdgeInsets:UIEdgeInsetsMake(0.0f, 12.0f, 0.0f, 10.0f)];
     [button setImageEdgeInsets:UIEdgeInsetsMake(0.0f, 8.0f, 0.0f, 0.0f)];
     [button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
