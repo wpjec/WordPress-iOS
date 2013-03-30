@@ -344,7 +344,7 @@
 								<string key="NSFrame">{{0, 168}, {320, 420}}</string>
 								<reference key="NSSuperview" ref="99848884"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="752427391"/>
+								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<object class="NSColor" key="IBUIBackgroundColor">
 									<int key="NSColorSpace">1</int>
@@ -367,7 +367,6 @@
 								<string key="NSFrame">{{190, 168}, {130, 420}}</string>
 								<reference key="NSSuperview" ref="99848884"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<object class="NSColor" key="IBUIBackgroundColor">
 									<int key="NSColorSpace">3</int>
@@ -375,30 +374,6 @@
 									<reference key="NSCustomColorSpace" ref="50148229"/>
 								</object>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-							</object>
-							<object class="IBUILabel" id="752427391">
-								<reference key="NSNextResponder" ref="99848884"/>
-								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{66, 344}, {188, 21}}</string>
-								<reference key="NSSuperview" ref="99848884"/>
-								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="454730490"/>
-								<string key="NSReuseIdentifierKey">_NS:9</string>
-								<bool key="IBUIOpaque">NO</bool>
-								<bool key="IBUIClipsSubviews">YES</bool>
-								<int key="IBUIContentMode">7</int>
-								<bool key="IBUIUserInteractionEnabled">NO</bool>
-								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-								<string key="IBUIText">Tap here to begin writing.</string>
-								<object class="NSColor" key="IBUITextColor">
-									<int key="NSColorSpace">3</int>
-									<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
-								</object>
-								<nil key="IBUIHighlightedColor"/>
-								<int key="IBUIBaselineAdjustment">0</int>
-								<reference key="IBUIFontDescription" ref="336518093"/>
-								<reference key="IBUIFont" ref="387315512"/>
-								<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
 							</object>
 						</array>
 						<string key="NSFrame">{{0, -128}, {320, 588}}</string>
@@ -510,14 +485,6 @@
 						<reference key="destination" ref="99848884"/>
 					</object>
 					<int key="connectionID">117</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">placeholderLabel</string>
-						<reference key="source" ref="372490531"/>
-						<reference key="destination" ref="752427391"/>
-					</object>
-					<int key="connectionID">36</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
@@ -659,7 +626,6 @@
 							<reference ref="131689330"/>
 							<reference ref="994011294"/>
 							<reference ref="598142234"/>
-							<reference ref="752427391"/>
 							<reference ref="454730490"/>
 						</array>
 						<reference key="parent" ref="191373211"/>
@@ -754,11 +720,6 @@
 						<string key="objectName">separator</string>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">35</int>
-						<reference key="object" ref="752427391"/>
-						<reference key="parent" ref="99848884"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">118</int>
 						<reference key="object" ref="598142234"/>
 						<reference key="parent" ref="99848884"/>
@@ -785,7 +746,6 @@
 				<string key="121.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="18.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="19.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-				<string key="35.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="39.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="55.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="82.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -864,7 +824,6 @@
 						<string key="overflowView">UIView</string>
 						<string key="panGesture">UIPanGestureRecognizer</string>
 						<string key="photoPreview">QuickPicturePreviewView</string>
-						<string key="placeholderLabel">UILabel</string>
 						<string key="popController">UIPopoverController</string>
 						<string key="tagsTextField">UITextField</string>
 						<string key="titleTextField">UITextField</string>
@@ -902,10 +861,6 @@
 						<object class="IBToOneOutletInfo" key="photoPreview">
 							<string key="name">photoPreview</string>
 							<string key="candidateClassName">QuickPicturePreviewView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="placeholderLabel">
-							<string key="name">placeholderLabel</string>
-							<string key="candidateClassName">UILabel</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="popController">
 							<string key="name">popController</string>

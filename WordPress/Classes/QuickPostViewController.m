@@ -45,7 +45,6 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet UIView *detailsView;
 @property (nonatomic, strong) IBOutlet UIView *overflowView;
 @property (nonatomic, strong) IBOutlet UIPanGestureRecognizer *panGesture;
-@property (nonatomic, strong) IBOutlet UILabel *placeholderLabel;
 @property (nonatomic, strong) UIImage *photo;
 @property (nonatomic, strong) IBOutlet QuickPicturePreviewView *photoPreview;
 @property (nonatomic, strong) IBOutlet UIPopoverController *popController;
@@ -94,8 +93,6 @@ typedef enum {
     self.navigationItem.rightBarButtonItem = postButton;
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
 
-    self.placeholderLabel.text = NSLocalizedString(@"Tap here to begin writing", @"Placeholder for the main body text. Should hint at tapping to enter text (not specifying body text).");
-
     bodyTextFieldFrame = self.bodyTextView.frame;
 
     self.blogSelector.delegate = self;
@@ -134,8 +131,6 @@ typedef enum {
             case QuickPostImageSourceTypeNone :
             default:
                 [self.bodyTextView becomeFirstResponder];
-                self.placeholderLabel.center = self.bodyTextView.center;
-                [self.placeholderLabel entice];
                 break;
         }
     }
