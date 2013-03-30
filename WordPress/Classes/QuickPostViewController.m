@@ -15,7 +15,6 @@
 #import "SidebarViewController.h"
 #import "UIImageView+Gravatar.h"
 #import "UIView+Entice.h"
-#import "WordPressAppDelegate.h"
 #import "WPCategorySelectionTableViewController.h"
 #import "WPPopoverBackgroundView.h"
 
@@ -29,7 +28,8 @@ typedef enum {
 
 @interface QuickPostViewController ()<BlogSelectorButtonDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPopoverControllerDelegate, UITextFieldDelegate, UITextViewDelegate, WPCategorySelectionTableViewControllerDelegate> {
     WordPressAppDelegate *appDelegate;
-    CGRect bodyTextFieldFrame;
+    CGRect originalFrame;
+    CGFloat keyboardOffset;
     BOOL isDragged;
     BOOL isDragging;
     BOOL isFirstView;
@@ -93,8 +93,6 @@ typedef enum {
     self.navigationItem.rightBarButtonItem = postButton;
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
 
-    bodyTextFieldFrame = self.bodyTextView.frame;
-
     self.blogSelector.delegate = self;
     [self.blogSelector loadBlogsForType:BlogSelectorButtonTypeQuickPhoto];
 
@@ -113,13 +111,18 @@ typedef enum {
         frame.origin.y += self.blogSelector.frame.size.height;
         self.overflowView.frame = frame;
     }
-
+    
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleCameraPlusImages:) name:kCameraPlusImagesNotification object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
+    CGRect frame = self.overflowView.frame;
+    frame.size.height = self.view.frame.size.height + ABS(frame.origin.y);
+    self.overflowView.frame = frame;
+    originalFrame = self.overflowView.frame;
+
     if (isFirstView) {
         isFirstView = NO;
         switch (self.imageSourceType) {
@@ -208,11 +211,25 @@ typedef enum {
 }
 
 - (void)finishDragInDirection:(UISwipeGestureRecognizerDirection)direction {
-    CGFloat finalY = (direction == UISwipeGestureRecognizerDirectionDown ? 0 : -self.detailsView.frame.size.height);
+    CGFloat finalY;
+    CGFloat heightOffset;
+
+    if (direction == UISwipeGestureRecognizerDirectionDown) {
+        finalY = 0;
+        heightOffset = -keyboardOffset;
+    } else {
+        finalY = -self.detailsView.frame.size.height;
+        heightOffset = self.detailsView.frame.size.height - keyboardOffset;
+    }
+
+    __block CGRect frame = self.overflowView.frame;
+    if (finalY == frame.origin.y) {
+        return;
+    }
 
     [UIView animateWithDuration:0.1f animations:^{
-        CGRect frame = self.overflowView.frame;
         frame.origin.y = finalY;
+        frame.size.height = self.view.frame.size.height + heightOffset;
         self.overflowView.frame = frame;
     } completion:^(BOOL finished) {
         isDragging = NO;
@@ -401,20 +418,22 @@ typedef enum {
 
     CGRect originalKeyboardFrame = [[keyboardInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
     CGRect keyboardFrame = [self.view convertRect:[self.view.window convertRect:originalKeyboardFrame fromWindow:nil] fromView:nil];
-
+    
     CGRect frame;
     if (showing) {
-        frame = self.bodyTextView.frame;
-        CGRect convertedBodyFrame = [self.view convertRect:self.bodyTextView.frame fromView:self.overflowView];
-        frame.size.height = keyboardFrame.origin.y - convertedBodyFrame.origin.y;
+        frame = originalFrame;
+
+        keyboardOffset = self.view.frame.size.height - keyboardFrame.origin.y;
+        frame.size.height = (keyboardFrame.origin.y - frame.origin.y);
     } else {
         // restore the original frame
-        frame = bodyTextFieldFrame;
+        frame = originalFrame;
+        keyboardOffset = 0;
     }
 
     [UIView animateWithDuration:duration animations:^{
         [UIView setAnimationCurve:curve];
-        self.bodyTextView.frame = frame;
+        self.overflowView.frame = frame;
     }];
 }
 
