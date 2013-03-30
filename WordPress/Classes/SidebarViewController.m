@@ -705,6 +705,10 @@ NSLog(@"%@", self.sectionInfoArray);
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     self.quickPostActionSheet = nil;
 
+    if (buttonIndex == actionSheet.cancelButtonIndex) {
+        return;
+    }
+
     QuickPostActionSheetButtons button = [[quickPostButtonIndexes objectForKey:[NSNumber numberWithInteger:buttonIndex]] integerValue];
 
     switch (button) {
