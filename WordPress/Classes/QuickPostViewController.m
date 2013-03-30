@@ -476,6 +476,16 @@ typedef enum {
     }];
 }
 
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    if (textField == self.tagsTextField) {
+        [self.titleTextField becomeFirstResponder];
+    } else if (textField == self.titleTextField) {
+        [self.bodyTextView becomeFirstResponder];
+    }
+
+    return YES;
+}
+
 #pragma mark - UITextViewDelegate methods
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
