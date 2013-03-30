@@ -278,6 +278,7 @@
 		4268733F16FDF4C100BBD539 /* QuickPostViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4268733E16FDF4C100BBD539 /* QuickPostViewController.m */; };
 		4268734316FDFB1400BBD539 /* QuickPostViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4268734216FDFB1400BBD539 /* QuickPostViewController.xib */; };
 		4268734916FE086A00BBD539 /* UIView+Entice.m in Sources */ = {isa = PBXBuildFile; fileRef = 4268734816FE086A00BBD539 /* UIView+Entice.m */; };
+		42CD541717065A6B0030B029 /* WPCategorySelectionTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 42CD541617065A6B0030B029 /* WPCategorySelectionTableViewController.m */; };
 		42D8C5E616FE451600FECF64 /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = 42D8C5E416FE451600FECF64 /* camera.png */; };
 		42D8C5E716FE451600FECF64 /* camera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 42D8C5E516FE451600FECF64 /* camera@2x.png */; };
 		42D8C5EA16FE5C2E00FECF64 /* photo-library.png in Resources */ = {isa = PBXBuildFile; fileRef = 42D8C5E816FE5C2E00FECF64 /* photo-library.png */; };
@@ -1023,6 +1024,8 @@
 		4268734216FDFB1400BBD539 /* QuickPostViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = QuickPostViewController.xib; path = Resources/QuickPostViewController.xib; sourceTree = "<group>"; };
 		4268734716FE086A00BBD539 /* UIView+Entice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Entice.h"; sourceTree = "<group>"; };
 		4268734816FE086A00BBD539 /* UIView+Entice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Entice.m"; sourceTree = "<group>"; };
+		42CD541517065A6B0030B029 /* WPCategorySelectionTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WPCategorySelectionTableViewController.h; sourceTree = "<group>"; };
+		42CD541617065A6B0030B029 /* WPCategorySelectionTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPCategorySelectionTableViewController.m; sourceTree = "<group>"; };
 		42D8C5E416FE451600FECF64 /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera.png; sourceTree = "<group>"; };
 		42D8C5E516FE451600FECF64 /* camera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "camera@2x.png"; sourceTree = "<group>"; };
 		42D8C5E816FE5C2E00FECF64 /* photo-library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "photo-library.png"; sourceTree = "<group>"; };
@@ -2604,6 +2607,8 @@
 				5DD91BC4163983670053E560 /* SoundUtil.m */,
 				8516972A169D42F4006C5DED /* WPToast.h */,
 				8516972B169D42F4006C5DED /* WPToast.m */,
+				42CD541517065A6B0030B029 /* WPCategorySelectionTableViewController.h */,
+				42CD541617065A6B0030B029 /* WPCategorySelectionTableViewController.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -3872,6 +3877,7 @@
 				E15051CB16CA5DDB00D3DDDC /* Blog+Jetpack.m in Sources */,
 				4268733F16FDF4C100BBD539 /* QuickPostViewController.m in Sources */,
 				4268734916FE086A00BBD539 /* UIView+Entice.m in Sources */,
+				42CD541717065A6B0030B029 /* WPCategorySelectionTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
