@@ -34,6 +34,7 @@ typedef enum {
 
 @interface BlogSelectorButton : UIButton<BlogSelectorViewControllerDelegate> {
     UIImageView *blavatarImageView;
+    NSUInteger _blogCount;
     UILabel *blogTitleLabel;
     UILabel *postToLabel;
     UIImageView *selectorImageView;

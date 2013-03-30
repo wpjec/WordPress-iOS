@@ -39,49 +39,64 @@
     if (self) {
         active = NO;
         self.autoresizesSubviews = YES;
+        postToLabel = [[UILabel alloc] init];
+        blavatarImageView = [[UIImageView alloc] init];
+        blogTitleLabel = [[UILabel alloc] init];
+        selectorImageView = [[UIImageView alloc] init];
 
-        static const CGFloat padding = 10.0f;
-
-        CGRect postToFrame = self.bounds;
-        postToFrame.origin.x = padding;
-        postToFrame.size.width = 85.0f;// TODO: constrain for other languages
-        postToLabel = [[UILabel alloc] initWithFrame:postToFrame];
-        postToLabel.font = [UIFont systemFontOfSize:17.0f];
-        postToLabel.textColor = [UIColor blackColor];
-        [postToLabel setText:NSLocalizedString(@"Post to:", @"")];
         [self addSubview:postToLabel];
-
-        CGRect blavatarFrame = self.bounds;
-        blavatarFrame.size.width = 36.0f;
-        blavatarFrame.size.height = 36.0f;
-        blavatarFrame.origin.x += postToFrame.origin.x + postToFrame.size.width;
-        blavatarImageView = [[UIImageView alloc] initWithFrame:blavatarFrame];
-        blavatarImageView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
         [self addSubview:blavatarImageView];
-
-        CGRect selectorImageFrame = self.bounds;
-        selectorImageFrame.size.width = 15.0f;
-        selectorImageFrame.origin.x = self.bounds.size.width - selectorImageFrame.size.width - padding;
-
-        CGRect blogTitleFrame = self.bounds;
-        blogTitleFrame.origin.x = blavatarFrame.origin.x + blavatarFrame.size.width;
-        blogTitleFrame.size.width -= (postToFrame.size.width + blavatarFrame.size.width + selectorImageFrame.size.width) + (padding * 3);
-        blogTitleLabel = [[UILabel alloc] initWithFrame:blogTitleFrame];
-        blogTitleLabel.font = [UIFont systemFontOfSize:17];
-        blogTitleLabel.numberOfLines = 1;
-        blogTitleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [self addSubview:blogTitleLabel];
-
-        selectorImageView = [[UIImageView alloc] initWithFrame:selectorImageFrame];
-        selectorImageView.contentMode = UIViewContentModeCenter;
-        selectorImageView.image = [UIImage imageNamed:@"downArrow"];
-        selectorImageView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
         [self addSubview:selectorImageView];
-
-        [self addTarget:self action:@selector(tap) forControlEvents:UIControlEventTouchUpInside];        
     }
 
     return self;
+}
+
+- (void)layoutSubviews {
+    static const CGFloat padding = 5.0f;
+
+    NSString *currentPostLabelText = postToLabel.text;
+    NSString *newLabelText = (self.blogCount == 1 ? NSLocalizedString(@"Posting to:", @"") : NSLocalizedString(@"Post to:", @""));
+
+    if ([currentPostLabelText isEqualToString:newLabelText]) {
+        return;
+    }
+
+    postToLabel.font = [UIFont systemFontOfSize:17.0f];
+    postToLabel.textColor = [UIColor blackColor];
+    postToLabel.text = newLabelText;
+
+    CGRect postToFrame = self.bounds;
+    postToFrame.origin.x = (padding * 2);
+    postToFrame.size.width = [postToLabel.text sizeWithFont:postToLabel.font].width + padding;
+    postToLabel.frame = postToFrame;
+
+    CGRect blavatarFrame = CGRectMake(postToFrame.origin.x + postToFrame.size.width, 3.0f, 36.0f, 36.0f);
+    blavatarImageView.frame = blavatarFrame;
+    blavatarImageView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+
+    CGRect selectorImageFrame = self.bounds;
+    selectorImageFrame.size.width = 15.0f;
+    selectorImageFrame.origin.x = self.bounds.size.width - selectorImageFrame.size.width - (padding * 2);
+
+    CGRect blogTitleFrame = self.bounds;
+    blogTitleFrame.origin.x = blavatarFrame.origin.x + blavatarFrame.size.width;
+    blogTitleFrame.size.width -= (postToFrame.size.width + blavatarFrame.size.width + selectorImageFrame.size.width) + (padding * 3);
+
+    blogTitleLabel.frame = blogTitleFrame;
+    blogTitleLabel.font = [UIFont systemFontOfSize:17];
+    blogTitleLabel.numberOfLines = 1;
+    blogTitleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+
+    selectorImageView.frame = selectorImageFrame;
+    selectorImageView.contentMode = UIViewContentModeCenter;
+    selectorImageView.image = [UIImage imageNamed:@"downArrow"];
+    selectorImageView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+
+    if (![[self actionsForTarget:self forControlEvent:UIControlEventAllEditingEvents] count]) {
+        [self addTarget:self action:@selector(tap) forControlEvents:UIControlEventTouchUpInside];
+    }
 }
 
 #pragma mark -
@@ -102,11 +117,21 @@
 
 - (void)loadBlogsForType:(BlogSelectorButtonType)aType {
     blogType = aType;
-    NSString *defaultsKey = [self defaultsKey];
+
     NSManagedObjectContext *moc = [[WordPressAppDelegate sharedWordPressApplicationDelegate] managedObjectContext];
     NSPersistentStoreCoordinator *psc = [[WordPressAppDelegate sharedWordPressApplicationDelegate] persistentStoreCoordinator];
     NSError *error = nil;
 
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Blog" inManagedObjectContext:moc]];
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"blogName" ascending:YES];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+    sortDescriptor = nil;
+    NSArray *results = [moc executeFetchRequest:fetchRequest error:&error];
+
+    self.blogCount = [results count];
+
+    NSString *defaultsKey = [self defaultsKey];
     if (defaultsKey != nil) {
         NSString *blogId = [[NSUserDefaults standardUserDefaults] objectForKey:defaultsKey];
         if (blogId != nil) {
@@ -116,34 +141,32 @@
             @catch (NSException *exception) {
                 self.activeBlog = nil;
             }
-            if (self.activeBlog == nil) {
+            if (!self.activeBlog) {
                 // The default blog was invalid, remove the stored default
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:defaultsKey];
             }
         }
     }
-    
 
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Blog" inManagedObjectContext:moc]];
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"blogName" ascending:YES];
-    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
-    sortDescriptor = nil;
-    NSArray *results = [moc executeFetchRequest:fetchRequest error:&error];
+    if ([results count] > 0 && !self.activeBlog) {
+        self.activeBlog = [results objectAtIndex:0];
+    }
+}
 
-    if (results && ([results count] > 0)) {
-        if (!self.activeBlog) {
-            self.activeBlog = [results objectAtIndex:0];
-        }
+- (void)setBlogCount:(NSUInteger)blogCount {
+    if (_blogCount != blogCount) {
+        _blogCount = blogCount;
 
-        self.blogCount = [results count];
-
-        // Disable selecting a blog if user has only one blog in the app.
-        if (self.blogCount == 1) {
-            [postToLabel setText: NSLocalizedString(@"Posting to:", @"")];
-            self.enabled = NO;
+        if (_blogCount > 1) {
+            selectorImageView.alpha = 1.0f;
+            self.enabled = YES;
+        } else {
+            // Disable selecting a blog if user has only one blog in the app.
             selectorImageView.alpha = 0.0f;
+            self.enabled = NO;
         }
+
+        [self setNeedsLayout];
     }
 }
 
@@ -152,14 +175,14 @@
         activeBlog = aBlog;
         [blavatarImageView setImageWithBlavatarUrl:activeBlog.blavatarUrl isWPcom:activeBlog.isWPcom];
         blogTitleLabel.text = activeBlog.blogName;
-        if ([blogTitleLabel.text isEqualToString:@""]) {
+        if ([blogTitleLabel.text isEmpty]) {
             blogTitleLabel.text = activeBlog.hostURL;
         }
     }
 }
 
 - (void)tap {
-    [FileLogger log:@"%@ %@", self, NSStringFromSelector(_cmd)];
+    WPFLogMethod();
     active = !active;
     
     if (self.delegate) {
