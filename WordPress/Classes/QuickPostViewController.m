@@ -109,6 +109,12 @@ typedef enum {
         self.bodyTextView.frame = frame;
     }
 
+    if (self.blogSelector.blogCount > 1) {
+        CGRect frame = self.overflowView.frame;
+        frame.origin.y += self.blogSelector.frame.size.height;
+        self.overflowView.frame = frame;
+    }
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleCameraPlusImages:) name:kCameraPlusImagesNotification object:nil];
@@ -456,6 +462,8 @@ typedef enum {
 - (void)blogSelectorButtonWillBecomeActive:(BlogSelectorButton *)button {
     [self.titleTextField resignFirstResponder];
     [self.bodyTextView resignFirstResponder];
+
+    [self finishDragInDirection:UISwipeGestureRecognizerDirectionDown];
 }
 
 #pragma mark - UIPickerControllerDelegate methods

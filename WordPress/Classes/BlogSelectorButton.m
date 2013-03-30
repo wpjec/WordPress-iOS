@@ -13,6 +13,8 @@
 
 @interface BlogSelectorButton ()
 
+@property (nonatomic, readwrite, assign) NSUInteger blogCount;
+
 - (void)tap;
 
 @end
@@ -121,21 +123,26 @@
         }
     }
     
-    if (self.activeBlog == nil) {
-        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-        [fetchRequest setEntity:[NSEntityDescription entityForName:@"Blog" inManagedObjectContext:moc]];
-        NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"blogName" ascending:YES];
-        [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
-         sortDescriptor = nil;
-        NSArray *results = [moc executeFetchRequest:fetchRequest error:&error];
-        if (results && ([results count] > 0)) {
+
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Blog" inManagedObjectContext:moc]];
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"blogName" ascending:YES];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+    sortDescriptor = nil;
+    NSArray *results = [moc executeFetchRequest:fetchRequest error:&error];
+
+    if (results && ([results count] > 0)) {
+        if (!self.activeBlog) {
             self.activeBlog = [results objectAtIndex:0];
-            //Disable selecting a blog if user has only one blog in the app.
-            if ([results count] == 1) {
-                [postToLabel setText: NSLocalizedString(@"Posting to:", @"")];
-                self.enabled = NO;
-                selectorImageView.alpha = 0.0f;
-            }
+        }
+
+        self.blogCount = [results count];
+
+        // Disable selecting a blog if user has only one blog in the app.
+        if (self.blogCount == 1) {
+            [postToLabel setText: NSLocalizedString(@"Posting to:", @"")];
+            self.enabled = NO;
+            selectorImageView.alpha = 0.0f;
         }
     }
 }

@@ -338,30 +338,6 @@
 								</object>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 							</object>
-							<object class="IBUILabel" id="752427391">
-								<reference key="NSNextResponder" ref="99848884"/>
-								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{66, 344}, {188, 21}}</string>
-								<reference key="NSSuperview" ref="99848884"/>
-								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="454730490"/>
-								<string key="NSReuseIdentifierKey">_NS:9</string>
-								<bool key="IBUIOpaque">NO</bool>
-								<bool key="IBUIClipsSubviews">YES</bool>
-								<int key="IBUIContentMode">7</int>
-								<bool key="IBUIUserInteractionEnabled">NO</bool>
-								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-								<string key="IBUIText">Tap here to begin writing.</string>
-								<object class="NSColor" key="IBUITextColor">
-									<int key="NSColorSpace">3</int>
-									<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
-								</object>
-								<nil key="IBUIHighlightedColor"/>
-								<int key="IBUIBaselineAdjustment">0</int>
-								<reference key="IBUIFontDescription" ref="336518093"/>
-								<reference key="IBUIFont" ref="387315512"/>
-								<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
-							</object>
 							<object class="IBUITextView" id="598142234">
 								<reference key="NSNextResponder" ref="99848884"/>
 								<int key="NSvFlags">274</int>
@@ -398,6 +374,30 @@
 									<reference key="NSCustomColorSpace" ref="50148229"/>
 								</object>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+							</object>
+							<object class="IBUILabel" id="752427391">
+								<reference key="NSNextResponder" ref="99848884"/>
+								<int key="NSvFlags">292</int>
+								<string key="NSFrame">{{66, 344}, {188, 21}}</string>
+								<reference key="NSSuperview" ref="99848884"/>
+								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView" ref="454730490"/>
+								<string key="NSReuseIdentifierKey">_NS:9</string>
+								<bool key="IBUIOpaque">NO</bool>
+								<bool key="IBUIClipsSubviews">YES</bool>
+								<int key="IBUIContentMode">7</int>
+								<bool key="IBUIUserInteractionEnabled">NO</bool>
+								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+								<string key="IBUIText">Tap here to begin writing.</string>
+								<object class="NSColor" key="IBUITextColor">
+									<int key="NSColorSpace">3</int>
+									<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
+								</object>
+								<nil key="IBUIHighlightedColor"/>
+								<int key="IBUIBaselineAdjustment">0</int>
+								<reference key="IBUIFontDescription" ref="336518093"/>
+								<reference key="IBUIFont" ref="387315512"/>
+								<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
 							</object>
 						</array>
 						<string key="NSFrame">{{0, -128}, {320, 588}}</string>
@@ -657,8 +657,8 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="131689330"/>
 							<reference ref="994011294"/>
-							<reference ref="752427391"/>
 							<reference ref="598142234"/>
+							<reference ref="752427391"/>
 							<reference ref="454730490"/>
 						</array>
 						<reference key="parent" ref="191373211"/>

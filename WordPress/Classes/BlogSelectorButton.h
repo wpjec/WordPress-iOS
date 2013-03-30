@@ -42,7 +42,9 @@ typedef enum {
     BlogSelectorButtonType blogType;
     CGRect normalFrame;
 }
+
 @property (nonatomic, strong) Blog *activeBlog;
+@property (nonatomic, readonly, assign) NSUInteger blogCount;
 @property (nonatomic, weak) id<BlogSelectorButtonDelegate> delegate;
 
 - (void)loadBlogsForType:(BlogSelectorButtonType)aType;
