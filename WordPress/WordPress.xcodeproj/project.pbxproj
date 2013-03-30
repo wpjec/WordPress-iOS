@@ -281,12 +281,6 @@
 		42CD541717065A6B0030B029 /* WPCategorySelectionTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 42CD541617065A6B0030B029 /* WPCategorySelectionTableViewController.m */; };
 		42CD57BE1706A72F0030B029 /* sidebar_quickpost.png in Resources */ = {isa = PBXBuildFile; fileRef = 42CD57BC1706A72F0030B029 /* sidebar_quickpost.png */; };
 		42CD57BF1706A72F0030B029 /* sidebar_quickpost@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 42CD57BD1706A72F0030B029 /* sidebar_quickpost@2x.png */; };
-		42D8C5E616FE451600FECF64 /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = 42D8C5E416FE451600FECF64 /* camera.png */; };
-		42D8C5E716FE451600FECF64 /* camera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 42D8C5E516FE451600FECF64 /* camera@2x.png */; };
-		42D8C5EA16FE5C2E00FECF64 /* photo-library.png in Resources */ = {isa = PBXBuildFile; fileRef = 42D8C5E816FE5C2E00FECF64 /* photo-library.png */; };
-		42D8C5EE16FE5CD400FECF64 /* camera-big.png in Resources */ = {isa = PBXBuildFile; fileRef = 42D8C5EC16FE5CD400FECF64 /* camera-big.png */; };
-		42D8C5F216FE5F6600FECF64 /* camera-big@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 42D8C5F016FE5F6600FECF64 /* camera-big@2x.png */; };
-		42D8C5F316FE5F6600FECF64 /* photo-library@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 42D8C5F116FE5F6600FECF64 /* photo-library@2x.png */; };
 		4526DC551148072F0090C99D /* Default-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = 4526DC531148072F0090C99D /* Default-Portrait.png */; };
 		4526DC561148072F0090C99D /* Default-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = 4526DC541148072F0090C99D /* Default-Landscape.png */; };
 		45C73C25113C36F70024D0D2 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 45C73C24113C36F70024D0D2 /* MainWindow-iPad.xib */; };
@@ -1030,12 +1024,6 @@
 		42CD541617065A6B0030B029 /* WPCategorySelectionTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WPCategorySelectionTableViewController.m; sourceTree = "<group>"; };
 		42CD57BC1706A72F0030B029 /* sidebar_quickpost.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sidebar_quickpost.png; path = Resources/Images/sidebar_quickpost.png; sourceTree = "<group>"; };
 		42CD57BD1706A72F0030B029 /* sidebar_quickpost@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar_quickpost@2x.png"; path = "Resources/Images/sidebar_quickpost@2x.png"; sourceTree = "<group>"; };
-		42D8C5E416FE451600FECF64 /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera.png; sourceTree = "<group>"; };
-		42D8C5E516FE451600FECF64 /* camera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "camera@2x.png"; sourceTree = "<group>"; };
-		42D8C5E816FE5C2E00FECF64 /* photo-library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "photo-library.png"; sourceTree = "<group>"; };
-		42D8C5EC16FE5CD400FECF64 /* camera-big.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "camera-big.png"; sourceTree = "<group>"; };
-		42D8C5F016FE5F6600FECF64 /* camera-big@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "camera-big@2x.png"; sourceTree = "<group>"; };
-		42D8C5F116FE5F6600FECF64 /* photo-library@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "photo-library@2x.png"; sourceTree = "<group>"; };
 		4526DC531148072F0090C99D /* Default-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait.png"; sourceTree = "<group>"; };
 		4526DC541148072F0090C99D /* Default-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape.png"; sourceTree = "<group>"; };
 		45B71DE4113EDAA100D0A33C /* Entitlements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
@@ -2418,12 +2406,6 @@
 			children = (
 				42CD57BC1706A72F0030B029 /* sidebar_quickpost.png */,
 				42CD57BD1706A72F0030B029 /* sidebar_quickpost@2x.png */,
-				42D8C5F016FE5F6600FECF64 /* camera-big@2x.png */,
-				42D8C5F116FE5F6600FECF64 /* photo-library@2x.png */,
-				42D8C5EC16FE5CD400FECF64 /* camera-big.png */,
-				42D8C5E816FE5C2E00FECF64 /* photo-library.png */,
-				42D8C5E416FE451600FECF64 /* camera.png */,
-				42D8C5E516FE451600FECF64 /* camera@2x.png */,
 				E1D0D82D16D3D2BA00E33F4C /* NNInstapaperActivity@2x~ipad.png */,
 				E1D0D82E16D3D2BA00E33F4C /* NNInstapaperActivity@2x~iphone.png */,
 				E1D0D82F16D3D2BA00E33F4C /* NNInstapaperActivity~ipad.png */,
@@ -3660,12 +3642,6 @@
 				E15051CE16CA8E4900D3DDDC /* logo_jetpack.png in Resources */,
 				E15051CF16CA8E4900D3DDDC /* logo_jetpack@2x.png in Resources */,
 				4268734316FDFB1400BBD539 /* QuickPostViewController.xib in Resources */,
-				42D8C5E616FE451600FECF64 /* camera.png in Resources */,
-				42D8C5E716FE451600FECF64 /* camera@2x.png in Resources */,
-				42D8C5EA16FE5C2E00FECF64 /* photo-library.png in Resources */,
-				42D8C5EE16FE5CD400FECF64 /* camera-big.png in Resources */,
-				42D8C5F216FE5F6600FECF64 /* camera-big@2x.png in Resources */,
-				42D8C5F316FE5F6600FECF64 /* photo-library@2x.png in Resources */,
 				42CD57BE1706A72F0030B029 /* sidebar_quickpost.png in Resources */,
 				42CD57BF1706A72F0030B029 /* sidebar_quickpost@2x.png in Resources */,
 			);
