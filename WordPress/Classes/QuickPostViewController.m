@@ -60,7 +60,9 @@ typedef enum {
 - (void)animateKeyboardForNotification:(NSNotification *)notification showing:(BOOL)showing;
 - (void)cancel;
 - (void)checkPostButtonStatus;
+- (void)closeDetailsView;
 - (void)dismiss;
+- (void)finishDragInDirection:(UISwipeGestureRecognizerDirection)direction;
 - (void)handleCameraPlusImages:(NSNotification *)notification;
 - (void)keyboardWillShow:(NSNotification *)notification;
 - (void)keyboardWillHide:(NSNotification *)notification;
@@ -146,20 +148,6 @@ typedef enum {
 
 #pragma mark - Implementation
 
-- (void)finishDragInDirection:(UISwipeGestureRecognizerDirection)direction {
-    CGFloat finalY = (direction == UISwipeGestureRecognizerDirectionDown ? 0 : -self.detailsView.frame.size.height);
-
-    [UIView animateWithDuration:0.1f animations:^{
-        CGRect frame = self.overflowView.frame;
-        frame.origin.y = finalY;
-        self.overflowView.frame = frame;
-    } completion:^(BOOL finished) {
-        isDragging = NO;
-        isDragged = (direction == UISwipeGestureRecognizerDirectionDown);
-        self.panGesture.enabled = YES;
-    }];
-}
-
 - (void)checkPostButtonStatus {
     self.navigationItem.rightBarButtonItem.enabled = self.bodyTextView.text || self.titleTextField.text || self.photo;
 }
@@ -175,6 +163,12 @@ typedef enum {
         [categorySelectionViewController showInPopoverViewFromView:self.view rect:popoverRect];
     } else {
         [categorySelectionViewController showInNavigationController:self.navigationController];
+    }
+}
+
+- (void)closeDetailsView {
+    if (isDragged) {
+        [self finishDragInDirection:UISwipeGestureRecognizerDirectionUp];
     }
 }
 
@@ -216,6 +210,20 @@ typedef enum {
     }
 
     [self.view bounce:-40.0f];
+}
+
+- (void)finishDragInDirection:(UISwipeGestureRecognizerDirection)direction {
+    CGFloat finalY = (direction == UISwipeGestureRecognizerDirectionDown ? 0 : -self.detailsView.frame.size.height);
+
+    [UIView animateWithDuration:0.1f animations:^{
+        CGRect frame = self.overflowView.frame;
+        frame.origin.y = finalY;
+        self.overflowView.frame = frame;
+    } completion:^(BOOL finished) {
+        isDragging = NO;
+        isDragged = (direction == UISwipeGestureRecognizerDirectionDown);
+        self.panGesture.enabled = YES;
+    }];
 }
 
 - (void)handleCameraPlusImages:(NSNotification *)notification {
@@ -422,9 +430,7 @@ typedef enum {
         return;
     }
 
-    if (isDragged) {
-        [self finishDragInDirection:UISwipeGestureRecognizerDirectionUp];
-    }
+    [self closeDetailsView];
 
     [UIView animateWithDuration:0.3f animations:^{
         self.detailsButton.alpha = 0.0f;
@@ -445,12 +451,21 @@ typedef enum {
 
 #pragma mark - UITextViewDelegate methods
 
+- (void)textViewDidBeginEditing:(UITextView *)textView {
+    if (textView != self.bodyTextView) {
+        return;
+    }
+
+    [self closeDetailsView];
+}
+
 - (void)textViewDidChange:(UITextView *)textView {
     if (textView != self.bodyTextView) {
         return;
     }
 
     [self checkPostButtonStatus];
+    [self closeDetailsView];
 }
 
 #pragma mark - BlogSelectorButtonDelegate methods
