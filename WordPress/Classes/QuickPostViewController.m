@@ -111,7 +111,7 @@ typedef enum {
         frame.origin.y += self.blogSelector.frame.size.height;
         self.overflowView.frame = frame;
     }
-    
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleCameraPlusImages:) name:kCameraPlusImagesNotification object:nil];
@@ -142,6 +142,14 @@ typedef enum {
 - (void)didReceiveMemoryWarning {
     WPFLogMethod();
     [super didReceiveMemoryWarning];
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    CGRect frame = self.overflowView.frame;
+    frame.size.height = self.view.frame.size.height + ABS(frame.origin.y);
+    frame.size.width = self.view.frame.size.width;
+    self.overflowView.frame = frame;
+    originalFrame = self.overflowView.frame;
 }
 
 #pragma mark - Implementation
@@ -186,6 +194,11 @@ typedef enum {
     self.overflowView.center = translatedPoint;
 
     if (gesture.state == UIGestureRecognizerStateEnded) {
+        if (IS_IPHONE && UIDeviceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+            [self.titleTextField resignFirstResponder];
+            [self.bodyTextView resignFirstResponder];
+        }
+
         CGPoint relativePoint = [gesture locationInView:self.view];
         CGFloat threshold = 80.0f;
 
