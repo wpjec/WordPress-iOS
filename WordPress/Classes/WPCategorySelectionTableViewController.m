@@ -114,7 +114,7 @@
     WPAddCategoryViewController *addCategoryViewController = [[WPAddCategoryViewController alloc] initWithNibName:@"WPAddCategoryViewController" bundle:nil];
     addCategoryViewController.blog = self.blog;
 
-    if (IS_IPAD == YES) {
+    if (IS_IPAD) {
         [self pushViewController:addCategoryViewController animated:YES];
     } else {
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:addCategoryViewController];
