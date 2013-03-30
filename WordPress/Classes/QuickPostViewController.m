@@ -59,7 +59,7 @@ typedef enum {
 - (void)animateKeyboardForNotification:(NSNotification *)notification showing:(BOOL)showing;
 - (void)cancel;
 - (void)checkPostButtonStatus;
-- (void)closeDetailsView;
+- (void)closeDetailsView:(BOOL)force;
 - (void)dismiss;
 - (void)finishDragInDirection:(UISwipeGestureRecognizerDirection)direction;
 - (void)handleCameraPlusImages:(NSNotification *)notification;
@@ -161,8 +161,8 @@ typedef enum {
     }
 }
 
-- (void)closeDetailsView {
-    if (isDragged) {
+- (void)closeDetailsView:(BOOL)force {
+    if (isDragged || force) {
         [self finishDragInDirection:UISwipeGestureRecognizerDirectionUp];
     }
 }
@@ -425,7 +425,7 @@ typedef enum {
         return;
     }
 
-    [self closeDetailsView];
+    [self closeDetailsView:NO];
 
     [UIView animateWithDuration:0.3f animations:^{
         self.detailsButton.alpha = 0.0f;
@@ -451,7 +451,7 @@ typedef enum {
         return;
     }
 
-    [self closeDetailsView];
+    [self closeDetailsView:NO];
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
@@ -460,7 +460,7 @@ typedef enum {
     }
 
     [self checkPostButtonStatus];
-    [self closeDetailsView];
+    [self closeDetailsView:YES];
 }
 
 #pragma mark - BlogSelectorButtonDelegate methods
