@@ -46,7 +46,6 @@ NSString *const EditPostViewControllerAutosaveDidFailNotification = @"EditPostVi
     BOOL isEditing;
     BOOL isShowingKeyboard;
     BOOL isExternalKeyboard;
-    BOOL isNewCategory;
     BOOL isShowingLinkAlert;
     UITextField *__weak currentEditingTextField;
     WPSegmentedSelectionTableViewController *segmentedTableViewController;
@@ -130,7 +129,6 @@ NSString *const EditPostViewControllerAutosaveDidFailNotification = @"EditPostVi
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceDidRotate:) name:@"UIDeviceOrientationDidChangeNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newCategoryCreatedNotificationReceived:) name:WPNewCategoryCreatedAndUpdatedInBlogNotificationName object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(insertMediaAbove:) name:@"ShouldInsertMediaAbove" object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(insertMediaBelow:) name:@"ShouldInsertMediaBelow" object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeMedia:) name:@"ShouldRemoveMedia" object:nil];	
@@ -344,7 +342,19 @@ NSString *const EditPostViewControllerAutosaveDidFailNotification = @"EditPostVi
 - (IBAction)showCategories:(id)sender {
     [textView resignFirstResponder];
     [currentEditingTextField resignFirstResponder];
-    [self populateSelectionsControllerWithCategories];
+
+    WPCategorySelectionTableViewController *categorySelectionViewController = [[WPCategorySelectionTableViewController alloc] initWithNibName:@"WPSelectionTableViewController" bundle:nil];
+
+    categorySelectionViewController.delegate = self;
+
+    if (IS_IPAD) {
+        CGRect popoverRect = [self.view convertRect:[categoriesButton frame] fromView:[categoriesButton superview]];
+        popoverRect.size.width = MIN(popoverRect.size.width, 100.0f);
+        [categorySelectionViewController showInPopoverViewFromView:self.view rect:popoverRect];
+    } else {
+        self.editMode = EditPostViewControllerModeEditPost;
+        [categorySelectionViewController showInNavigationController:self.navigationController];
+    }
 }
 
 - (CGRect)normalTextFrame {
@@ -462,87 +472,6 @@ NSString *const EditPostViewControllerAutosaveDidFailNotification = @"EditPostVi
 
     [self refreshButtons];
 }
-
-- (void)populateSelectionsControllerWithCategories {
-    WPFLogMethod();
-    if (segmentedTableViewController == nil)
-        segmentedTableViewController = [[WPSegmentedSelectionTableViewController alloc] initWithNibName:@"WPSelectionTableViewController" bundle:nil];
-	
-	NSArray *cats = [self.post.blog sortedCategories];
-
-	NSArray *selObject = [self.post.categories allObjects];
-	
-    [segmentedTableViewController populateDataSource:cats    //datasource
-									   havingContext:kSelectionsCategoriesContext
-									 selectedObjects:selObject
-									   selectionType:kCheckbox
-										 andDelegate:self];
-	
-    segmentedTableViewController.title = NSLocalizedString(@"Categories", @"");
-    if ([createCategoryBarButtonItem respondsToSelector:@selector(setTintColor:)]) {
-        createCategoryBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"navbar_add"]style:UIBarButtonItemStyleBordered 
-                                                                      target:self 
-                                                                      action:@selector(showAddNewCategoryView:)];
-    } 
-    
-    segmentedTableViewController.navigationItem.rightBarButtonItem = createCategoryBarButtonItem;
-	
-    if (isNewCategory != YES) {
-		if (IS_IPAD == YES) {
-            UINavigationController *navController;
-            if (segmentedTableViewController.navigationController) {
-                navController = segmentedTableViewController.navigationController;
-            } else {
-                navController = [[UINavigationController alloc] initWithRootViewController:segmentedTableViewController];
-            }
- 			UIPopoverController *popover = [[UIPopoverController alloc] initWithContentViewController:navController];
-            if ([popover respondsToSelector:@selector(popoverBackgroundViewClass)]) {
-                popover.popoverBackgroundViewClass = [WPPopoverBackgroundView class];
-            }
-            popover.delegate = self;
-			CGRect popoverRect = [self.view convertRect:[categoriesButton frame] fromView:[categoriesButton superview]];
-			popoverRect.size.width = MIN(popoverRect.size.width, 100.0f); // the text field is actually really big
-            popover.popoverContentSize = CGSizeMake(320.0f, 460.0f);
-			[popover presentPopoverFromRect:popoverRect inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-			[[CPopoverManager instance] setCurrentPopoverController:popover];
-		
-        } else {
-			self.editMode = EditPostViewControllerModeEditPost;
-			[self.navigationController pushViewController:segmentedTableViewController animated:YES];
-		}
-    }
-	
-	isNewCategory = NO;
-}
-
-- (void)selectionTableViewController:(WPSelectionTableViewController *)selctionController completedSelectionsWithContext:(void *)selContext selectedObjects:(NSArray *)selectedObjects haveChanges:(BOOL)isChanged {
-    WPFLogMethod();
-    if (!isChanged) {
-        return;
-    }
-
-    if (selContext == kSelectionsCategoriesContext) {
-        NSLog(@"selected categories: %@", selectedObjects);
-        NSLog(@"post: %@", self.post);
-        self.post.categories = [NSMutableSet setWithArray:selectedObjects];
-        [categoriesButton setTitle:[NSString decodeXMLCharactersIn:[self.post categoriesText]] forState:UIControlStateNormal];
-    }
-
-    _hasChangesToAutosave = YES;
-    [self autosaveContent];
-
-	[self refreshButtons];
-}
-
-
-- (void)newCategoryCreatedNotificationReceived:(NSNotification *)notification {
-    WPFLogMethod();
-    if ([segmentedTableViewController curContext] == kSelectionsCategoriesContext) {
-        isNewCategory = YES;
-        [self populateSelectionsControllerWithCategories];
-    }
-}
-
 
 - (IBAction)showAddNewCategoryView:(id)sender
 {
@@ -1431,6 +1360,26 @@ NSString *const EditPostViewControllerAutosaveDidFailNotification = @"EditPostVi
 - (void)didReceiveMemoryWarning {
     WPFLogMethod();
     [super didReceiveMemoryWarning];
+}
+
+#pragma mark - WPCategorySelectionTableViewControllerDelegate methods
+
+- (Blog *)blogForCategorySelection {
+    return self.post.blog;
+}
+
+- (void)categoriesSelected:(NSArray *)categories {
+    self.post.categories = [NSMutableSet setWithArray:categories];
+    [categoriesButton setTitle:[NSString decodeXMLCharactersIn:[self.post categoriesText]] forState:UIControlStateNormal];
+
+    _hasChangesToAutosave = YES;
+    [self autosaveContent];
+
+    [self refreshButtons];
+}
+
+- (NSArray *)selectedCategories {
+    return [self.post.categories allObjects];
 }
 
 @end

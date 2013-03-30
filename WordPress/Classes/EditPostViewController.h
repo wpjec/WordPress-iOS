@@ -1,8 +1,8 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import "WPKeyboardToolbar.h"
+#import "WPCategorySelectionTableViewController.h"
 
-#define kSelectionsStatusContext ((void *)1000)
 #define kSelectionsCategoriesContext ((void *)2000)
 
 @class AbstractPost;
@@ -12,6 +12,6 @@ typedef NS_ENUM(NSUInteger, EditPostViewControllerMode) {
 	EditPostViewControllerModeEditPost
 };
 
-@interface EditPostViewController : UIViewController <UIActionSheetDelegate, UITextFieldDelegate, UITextViewDelegate, UIPopoverControllerDelegate,WPKeyboardToolbarDelegate>
+@interface EditPostViewController : UIViewController <UIActionSheetDelegate, UITextFieldDelegate, UITextViewDelegate, UIPopoverControllerDelegate,WPKeyboardToolbarDelegate, WPCategorySelectionTableViewControllerDelegate>
 - (id)initWithPost:(AbstractPost *)aPost;
 @end
