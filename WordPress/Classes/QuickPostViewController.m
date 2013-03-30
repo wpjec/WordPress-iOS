@@ -9,12 +9,14 @@
 #import "QuickPostViewController.h"
 #import "Blog.h"
 #import "CameraPlusPickerManager.h"
+#import "NSString+XMLExtensions.h"
 #import "Post.h"
 #import "QuickPicturePreviewView.h"
 #import "SidebarViewController.h"
 #import "UIImageView+Gravatar.h"
 #import "UIView+Entice.h"
 #import "WordPressAppDelegate.h"
+#import "WPCategorySelectionTableViewController.h"
 #import "WPPopoverBackgroundView.h"
 
 typedef enum {
@@ -25,7 +27,7 @@ typedef enum {
     kAnimationDirectionSlideDown
 } AnimationDirection;
 
-@interface QuickPostViewController () {
+@interface QuickPostViewController ()<BlogSelectorButtonDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPopoverControllerDelegate, UITextFieldDelegate, UITextViewDelegate, WPCategorySelectionTableViewControllerDelegate> {
     WordPressAppDelegate *appDelegate;
     CGRect bodyTextFieldFrame;
     BOOL isDragged;
@@ -38,6 +40,7 @@ typedef enum {
 
 @property (nonatomic, strong) IBOutlet BlogSelectorButton *blogSelector;
 @property (nonatomic, strong) IBOutlet UITextView *bodyTextView;
+@property (nonatomic, strong) IBOutlet UIButton *categoriesButton;
 @property (nonatomic, strong) IBOutlet UIButton *detailsButton;
 @property (nonatomic, strong) IBOutlet UIView *detailsView;
 @property (nonatomic, strong) IBOutlet UIView *overflowView;
@@ -50,6 +53,7 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet UITextField *titleTextField;
 @property (nonatomic, strong) IBOutlet UIView *titleView;
 
+- (IBAction)chooseCategories:(id)sender;
 - (IBAction)detailsButtonSwiped:(UIPanGestureRecognizer *)gesture;
 - (IBAction)detailsButtonTapped:(id)sender;
 
@@ -130,7 +134,7 @@ typedef enum {
 }
 
 - (void)didReceiveMemoryWarning {
-    [FileLogger log:@"%@ %@", self, NSStringFromSelector(_cmd)];
+    WPFLogMethod();
     [super didReceiveMemoryWarning];
 }
 
@@ -148,6 +152,24 @@ typedef enum {
         isDragged = (direction == UISwipeGestureRecognizerDirectionDown);
         self.panGesture.enabled = YES;
     }];
+}
+
+- (void)checkPostButtonStatus {
+    self.navigationItem.rightBarButtonItem.enabled = self.bodyTextView.text || self.titleTextField.text || self.photo;
+}
+
+- (IBAction)chooseCategories:(id)sender {
+    WPCategorySelectionTableViewController *categorySelectionViewController = [[WPCategorySelectionTableViewController alloc] initWithNibName:@"WPSelectionTableViewController" bundle:nil];
+
+    categorySelectionViewController.delegate = self;
+
+    if (IS_IPAD) {
+        CGRect popoverRect = [self.view convertRect:[self.categoriesButton frame] fromView:[self.categoriesButton superview]];
+        popoverRect.size.width = MIN(popoverRect.size.width, 100.0f);
+        [categorySelectionViewController showInPopoverViewFromView:self.view rect:popoverRect];
+    } else {
+        [categorySelectionViewController showInNavigationController:self.navigationController];
+    }
 }
 
 - (IBAction)detailsButtonSwiped:(UIPanGestureRecognizer *)gesture {
@@ -188,10 +210,6 @@ typedef enum {
     }
 
     [self.view bounce:-40.0f];
-}
-
-- (void)checkPostButtonStatus {
-    self.navigationItem.rightBarButtonItem.enabled = self.bodyTextView.text || self.titleTextField.text || self.photo;
 }
 
 - (void)handleCameraPlusImages:(NSNotification *)notification {
@@ -487,6 +505,25 @@ typedef enum {
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
     [self dismiss];
+}
+
+#pragma mark - WPCategorySelectionTableViewControllerDelegate methods
+
+- (Blog *)blogForCategorySelection {
+    return self.blogSelector.activeBlog;
+}
+
+- (void)categoriesSelected:(NSArray *)categories {
+    if (!post) {
+        post = [Post newDraftForBlog:self.blogSelector.activeBlog];
+    }
+
+    post.categories = [NSMutableSet setWithArray:categories];
+    [self.categoriesButton setTitle:[NSString decodeXMLCharactersIn:[post categoriesText]] forState:UIControlStateNormal];
+}
+
+- (NSArray *)selectedCategories {
+    return [[post categories] allObjects];
 }
 
 @end

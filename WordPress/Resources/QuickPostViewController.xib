@@ -544,6 +544,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">categoriesButton</string>
+						<reference key="source" ref="372490531"/>
+						<reference key="destination" ref="73707888"/>
+					</object>
+					<int key="connectionID">126</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="665611071"/>
 						<reference key="destination" ref="372490531"/>
@@ -568,6 +576,15 @@
 						<int key="IBEventType">7</int>
 					</object>
 					<int key="connectionID">60</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">chooseCategories:</string>
+						<reference key="source" ref="73707888"/>
+						<reference key="destination" ref="372490531"/>
+						<int key="IBEventType">7</int>
+					</object>
+					<int key="connectionID">125</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
@@ -784,7 +801,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">124</int>
+			<int key="maxID">126</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -819,10 +836,15 @@
 					<string key="className">QuickPostViewController</string>
 					<string key="superclassName">UIViewController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="chooseCategories:">id</string>
 						<string key="detailsButtonSwiped:">UIPanGestureRecognizer</string>
 						<string key="detailsButtonTapped:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="chooseCategories:">
+							<string key="name">chooseCategories:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="detailsButtonSwiped:">
 							<string key="name">detailsButtonSwiped:</string>
 							<string key="candidateClassName">UIPanGestureRecognizer</string>
@@ -835,6 +857,7 @@
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="blogSelector">BlogSelectorButton</string>
 						<string key="bodyTextView">UITextView</string>
+						<string key="categoriesButton">UIButton</string>
 						<string key="detailsButton">UIButton</string>
 						<string key="detailsView">UIView</string>
 						<string key="overflowView">UIView</string>
@@ -854,6 +877,10 @@
 						<object class="IBToOneOutletInfo" key="bodyTextView">
 							<string key="name">bodyTextView</string>
 							<string key="candidateClassName">UITextView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="categoriesButton">
+							<string key="name">categoriesButton</string>
+							<string key="candidateClassName">UIButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="detailsButton">
 							<string key="name">detailsButton</string>
