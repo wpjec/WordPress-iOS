@@ -29,6 +29,7 @@ typedef enum {
 @interface QuickPostViewController ()<BlogSelectorButtonDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPopoverControllerDelegate, UITextFieldDelegate, UITextViewDelegate, WPCategorySelectionTableViewControllerDelegate> {
     WordPressAppDelegate *appDelegate;
     CGRect originalFrame;
+    CGRect previousFrame;
     CGFloat keyboardOffset;
     BOOL isDragged;
     BOOL isDragging;
@@ -121,6 +122,7 @@ typedef enum {
     CGRect frame = self.overflowView.frame;
     frame.size.height = self.view.frame.size.height + ABS(frame.origin.y);
     self.overflowView.frame = frame;
+    previousFrame = self.overflowView.frame;
     originalFrame = self.overflowView.frame;
 
     if (isFirstView) {
@@ -149,7 +151,7 @@ typedef enum {
         CGRect frame = self.overflowView.frame;
         frame.size.width = self.view.frame.size.width;
         self.overflowView.frame = frame;
-        originalFrame = self.overflowView.frame;
+        previousFrame = self.overflowView.frame;
     }
 }
 
@@ -249,6 +251,7 @@ typedef enum {
         isDragging = NO;
         isDragged = (direction == UISwipeGestureRecognizerDirectionDown);
         self.panGesture.enabled = YES;
+        previousFrame = self.overflowView.frame;
     }];
 }
 
@@ -435,7 +438,7 @@ typedef enum {
     
     CGRect frame;
     if (showing) {
-        frame = originalFrame;
+        frame = previousFrame;
 
         keyboardOffset = self.view.frame.size.height - keyboardFrame.origin.y;
         frame.size.height = (keyboardFrame.origin.y - frame.origin.y);
