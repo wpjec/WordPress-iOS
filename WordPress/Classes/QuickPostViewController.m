@@ -515,6 +515,11 @@ typedef enum {
     return self.overflowView;
 }
 
+- (void)blogSelectorButton:(BlogSelectorButton *)button didSelectBlog:(Blog *)blog {
+    [self.categoriesButton setTitle:@"" forState:UIControlStateNormal];
+    [post.categories removeAllObjects];
+}
+
 - (void)blogSelectorButtonWillBecomeActive:(BlogSelectorButton *)button {
     [self.titleTextField resignFirstResponder];
     [self.bodyTextView resignFirstResponder];

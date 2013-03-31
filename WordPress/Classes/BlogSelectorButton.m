@@ -260,9 +260,10 @@
 #pragma mark - Blog Selector delegate
 
 - (void)blogSelectorViewController:(BlogSelectorViewController *)blogSelector didSelectBlog:(Blog *)blog {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(blogSelectorViewController:didSelectBlog:)]) {
+    if ([self.delegate respondsToSelector:@selector(blogSelectorButton:didSelectBlog:)]) {
         [self.delegate blogSelectorButton:self didSelectBlog:blog];
     }
+
     self.activeBlog = blog;
     NSString *defaultsKey = [self defaultsKey];
     if (defaultsKey != nil) {
