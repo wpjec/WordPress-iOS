@@ -68,6 +68,7 @@ typedef enum {
 - (void)keyboardWillHide:(NSNotification *)notification;
 - (void)post;
 - (void)showPhotoPicker:(UIImagePickerControllerSourceType)sourceType;
+- (void)showPhotoPickerPopover:(UIPopoverController *)popover;
 
 @end
 
@@ -152,6 +153,10 @@ typedef enum {
         frame.size.width = self.view.frame.size.width;
         self.overflowView.frame = frame;
         previousFrame = self.overflowView.frame;
+    } else {
+        if (self.popController.popoverVisible) {
+            [self showPhotoPickerPopover:self.popController];
+        }
     }
 }
 
@@ -325,13 +330,17 @@ typedef enum {
                 self.popController.popoverBackgroundViewClass = [WPPopoverBackgroundView class];
             }
             self.popController.delegate = self;
-            CGRect rect = CGRectMake((self.view.frame.size.width/2), 1.0f, 1.0f, 1.0f); // puts the arrow in the middle of the screen
-            [self.popController presentPopoverFromRect:rect inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+            [self showPhotoPickerPopover:self.popController];
         } else {
             picker.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
             [self presentModalViewController:picker animated:YES];
         }
     }
+}
+
+- (void)showPhotoPickerPopover:(UIPopoverController *)popover {
+    CGRect rect = CGRectMake((self.view.frame.size.width/2), 1.0f, 1.0f, 1.0f); // puts the arrow in the middle of the screen
+    [popover presentPopoverFromRect:rect inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 }
 
 #pragma mark - Nav Button Methods
