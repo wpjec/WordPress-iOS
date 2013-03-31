@@ -16,6 +16,7 @@
 @property (nonatomic, readwrite, assign) NSUInteger blogCount;
 
 - (void)tap;
+- (void)deviceDidRotate:(NSNotification *)notification;
 
 @end
 
@@ -48,6 +49,8 @@
         [self addSubview:blavatarImageView];
         [self addSubview:blogTitleLabel];
         [self addSubview:selectorImageView];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceDidRotate:) name:@"UIDeviceOrientationDidChangeNotification" object:nil];
     }
 
     return self;
@@ -56,20 +59,18 @@
 - (void)layoutSubviews {
     static const CGFloat padding = 5.0f;
 
-    NSString *currentPostLabelText = postToLabel.text;
-    NSString *newLabelText = (self.blogCount == 1 ? NSLocalizedString(@"Posting to:", @"") : NSLocalizedString(@"Post to:", @""));
-
-    if ([currentPostLabelText isEqualToString:newLabelText]) {
-        return;
-    }
+    NSString *postToLabelText = (self.blogCount == 1 ? NSLocalizedString(@"Posting to:", @"") : NSLocalizedString(@"Post to:", @""));
 
     postToLabel.font = [UIFont systemFontOfSize:17.0f];
     postToLabel.textColor = [UIColor blackColor];
-    postToLabel.text = newLabelText;
+    postToLabel.text = postToLabelText;
 
     CGRect postToFrame = self.bounds;
     postToFrame.origin.x = (padding * 2);
     postToFrame.size.width = [postToLabel.text sizeWithFont:postToLabel.font].width + padding;
+    if (active) {
+        postToFrame.size.height = normalFrame.size.height;
+    }
     postToLabel.frame = postToFrame;
 
     CGRect blavatarFrame = CGRectMake(postToFrame.origin.x + postToFrame.size.width, 3.0f, 36.0f, 36.0f);
@@ -79,10 +80,16 @@
     CGRect selectorImageFrame = self.bounds;
     selectorImageFrame.size.width = 15.0f;
     selectorImageFrame.origin.x = self.bounds.size.width - selectorImageFrame.size.width - (padding * 2);
+    if (active) {
+        selectorImageFrame.size.height = normalFrame.size.height;
+    }
 
     CGRect blogTitleFrame = self.bounds;
     blogTitleFrame.origin.x = blavatarFrame.origin.x + blavatarFrame.size.width;
     blogTitleFrame.size.width -= (postToFrame.size.width + blavatarFrame.size.width + selectorImageFrame.size.width) + (padding * 3);
+    if (active) {
+        blogTitleFrame.size.height = normalFrame.size.height;
+    }
 
     blogTitleLabel.frame = blogTitleFrame;
     blogTitleLabel.font = [UIFont systemFontOfSize:17];
@@ -96,6 +103,12 @@
 
     if (![[self actionsForTarget:self forControlEvent:UIControlEventAllEditingEvents] count]) {
         [self addTarget:self action:@selector(tap) forControlEvents:UIControlEventTouchUpInside];
+    }
+}
+
+- (void)deviceDidRotate:(NSNotification *)notification {
+    if (active && IS_IPHONE) {
+        normalFrame.size.width = self.frame.size.width;
     }
 }
 
