@@ -160,6 +160,18 @@ typedef enum {
     }
 }
 
+- (NSUInteger)supportedInterfaceOrientations {
+    if (IS_IPHONE) {
+        return UIInterfaceOrientationMaskPortrait;
+    }
+
+    return UIInterfaceOrientationMaskAll;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    return IS_IPAD || interfaceOrientation == UIDeviceOrientationPortrait;
+}
+
 #pragma mark - Implementation
 
 - (void)checkPostButtonStatus {
