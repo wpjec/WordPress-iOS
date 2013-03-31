@@ -145,11 +145,12 @@ typedef enum {
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    CGRect frame = self.overflowView.frame;
-    frame.size.height = self.view.frame.size.height + ABS(frame.origin.y);
-    frame.size.width = self.view.frame.size.width;
-    self.overflowView.frame = frame;
-    originalFrame = self.overflowView.frame;
+    if (IS_IPHONE) {
+        CGRect frame = self.overflowView.frame;
+        frame.size.width = self.view.frame.size.width;
+        self.overflowView.frame = frame;
+        originalFrame = self.overflowView.frame;
+    }
 }
 
 #pragma mark - Implementation
