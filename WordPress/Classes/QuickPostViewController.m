@@ -167,7 +167,7 @@ typedef enum {
     categorySelectionViewController.delegate = self;
 
     if (IS_IPAD) {
-        CGRect popoverRect = [self.view convertRect:[self.categoriesButton frame] fromView:[self.categoriesButton superview]];
+        CGRect popoverRect = [self.view convertRect:self.categoriesButton.frame fromView:self.overflowView];
         popoverRect.size.width = MIN(popoverRect.size.width, 100.0f);
         [categorySelectionViewController showInPopoverViewFromView:self.view rect:popoverRect];
     } else {

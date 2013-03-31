@@ -35,6 +35,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.title = NSLocalizedString(@"Categories", @"");
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"navbar_add"] style:UIBarButtonItemStyleBordered target:self action:@selector(showAddNewCategoryView:)];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(categoryCreated:) name:WPNewCategoryCreatedAndUpdatedInBlogNotificationName object:nil];
@@ -47,7 +48,7 @@
 }
 
 - (void)deviceDidRotate:(NSNotification *)notification {
-    if (popover) {
+    if (popover.isPopoverVisible) {
         // Redisplay the popover to ensure it's in the correct location after rotation
         [popover presentPopoverFromRect:popoverRect inView:popoverView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
     }
@@ -81,6 +82,7 @@
     popover = [[UIPopoverController alloc] initWithContentViewController:navController];
     popover.popoverBackgroundViewClass = [WPPopoverBackgroundView class];
     popover.delegate = self;
+    popover.popoverContentSize = CGSizeMake(320.0f, 460.0f);
 
     [popover presentPopoverFromRect:rect inView:view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
     [[CPopoverManager instance] setCurrentPopoverController:popover];
@@ -131,6 +133,19 @@
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:addCategoryViewController];
         [self presentModalViewController:nc animated:YES];
     }
+}
+
+#pragma mark - UIPopoverControllerDelegate Methods
+
+- (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController {
+    if ([popoverController.contentViewController class] == [UINavigationController class]) {
+        UINavigationController *nav = (UINavigationController *)popoverController.contentViewController;
+        if ([nav.viewControllers count] == 2) {
+            WPSegmentedSelectionTableViewController *selController = [nav.viewControllers objectAtIndex:0];
+            [selController popViewControllerAnimated:YES];
+        }
+    }
+    return YES;
 }
 
 @end
