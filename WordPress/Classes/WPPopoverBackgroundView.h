@@ -14,6 +14,7 @@
     CGFloat arrowOffset;
     UIImageView *borderImageView;
     UIImageView *arrowImageView;
+    BOOL hasChangesToLayout;
 }
 
 @property (nonatomic, readwrite) UIPopoverArrowDirection arrowDirection;

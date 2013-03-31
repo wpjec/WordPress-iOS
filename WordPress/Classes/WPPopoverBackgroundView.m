@@ -35,6 +35,15 @@
     return ARROW_HEIGHT;
 }
 
+- (void)setFrame:(CGRect)frame {
+    if (CGRectEqualToRect(frame, self.frame)) {
+        return;
+    }
+
+    hasChangesToLayout = YES;
+
+    [super setFrame:frame];
+}
 
 #pragma mark -
 #pragma mark Instance Methods
@@ -48,6 +57,8 @@
         
         [self addSubview:borderImageView];
         [self insertSubview:arrowImageView aboveSubview:borderImageView];
+
+        hasChangesToLayout = YES;
     }
     return self;
 }
@@ -55,12 +66,17 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
 
+    if (!hasChangesToLayout) {
+        return;
+    }
+
     CGFloat height = self.frame.size.height;
     CGFloat width = self.frame.size.width;
     CGFloat left = 0.0;
     CGFloat top = 0.0;
     CGFloat coordinate = 0.0;
     CGAffineTransform rotation = CGAffineTransformIdentity;
+    CGPoint arrowCenter;
 
     switch (self.arrowDirection) {
         case UIPopoverArrowDirectionUp:
@@ -68,31 +84,40 @@
             height -= ARROW_HEIGHT;
             coordinate = ((width / 2) + self.arrowOffset) - (ARROW_BASE/2);
             coordinate = MIN(MAX(CAP_INSET, coordinate), width - (CAP_INSET + (ARROW_BASE / 2)));
-            self.arrowImageView.frame = CGRectMake(coordinate, 1.0f, ARROW_BASE, ARROW_HEIGHT);            
+
+            arrowCenter = CGPointMake(coordinate, CONTENT_INSET + 2.0f);
+
             break;
 
         case UIPopoverArrowDirectionDown:
             height -= ARROW_HEIGHT;
             coordinate = ((width / 2) + self.arrowOffset) - (ARROW_BASE/2);
             coordinate = MIN(MAX(CAP_INSET, coordinate), width - (CAP_INSET + (ARROW_BASE / 2)));
-            arrowImageView.frame = CGRectMake(coordinate, height-1.0f, ARROW_BASE, ARROW_HEIGHT); 
+
+            arrowCenter = CGPointMake(coordinate, height + (CONTENT_INSET - 1.0f));
+
             rotation = CGAffineTransformMakeRotation( M_PI );
             break;
             
         case UIPopoverArrowDirectionLeft:
-            left += ARROW_BASE;
-            width -= ARROW_BASE;
+            left = ARROW_HEIGHT;
+            width -= left;
             coordinate = ((height / 2) + self.arrowOffset) - (ARROW_HEIGHT/2);
             coordinate = MIN(MAX(CAP_INSET, coordinate), height - (CAP_INSET + (ARROW_BASE / 2)));
-            arrowImageView.frame = CGRectMake(1.0f, coordinate, ARROW_BASE, ARROW_HEIGHT); 
+
+            arrowCenter = CGPointMake(left - (CONTENT_INSET - 1.0f), coordinate);
+
             rotation = CGAffineTransformMakeRotation( -M_PI_2 );
             break;
             
         case UIPopoverArrowDirectionRight:
-            width -= ARROW_BASE;
+            width -= ARROW_HEIGHT;
+
             coordinate = ((height / 2) + self.arrowOffset)- (ARROW_HEIGHT/2);
             coordinate = MIN(MAX(CAP_INSET, coordinate), height - (CAP_INSET + (ARROW_BASE / 2)));
-            arrowImageView.frame = CGRectMake(width-1.0f, coordinate, ARROW_BASE, ARROW_HEIGHT); 
+
+            arrowCenter = CGPointMake(width + (ARROW_HEIGHT / 2.0f) - 1.0f, coordinate);
+
             rotation = CGAffineTransformMakeRotation( M_PI_2 );
             break;
         default:
@@ -100,17 +125,28 @@
     }
     
     self.borderImageView.frame = CGRectMake(left, top, width, height);
-    
+
+    arrowImageView.center = arrowCenter;
     [arrowImageView setTransform:rotation];
+
+    hasChangesToLayout = NO;
 }
 
 - (void)setArrowOffset:(CGFloat)offset {
+    if (offset == _arrowOffset) {
+        return;
+    }
     _arrowOffset = offset;
+    hasChangesToLayout = YES;
     [self setNeedsLayout];
 }
 
 - (void)setArrowDirection:(UIPopoverArrowDirection)direction {
+    if (direction == _arrowDirection) {
+        return;
+    }
     _arrowDirection = direction;
+    hasChangesToLayout = YES;
     [self setNeedsLayout];
 }
 
