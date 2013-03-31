@@ -3,7 +3,6 @@
 #import "Post.h"
 #import "AutosavingIndicatorView.h"
 #import "NSString+XMLExtensions.h"
-#import "WPPopoverBackgroundView.h"
 #import "WPAddCategoryViewController.h"
 #import "UIView+Entice.h"
 
@@ -471,19 +470,6 @@ NSString *const EditPostViewControllerAutosaveDidFailNotification = @"EditPostVi
 	[textView setContentOffset:CGPointZero animated:NO];
 
     [self refreshButtons];
-}
-
-- (IBAction)showAddNewCategoryView:(id)sender
-{
-    WPFLogMethod();
-    WPAddCategoryViewController *addCategoryViewController = [[WPAddCategoryViewController alloc] initWithNibName:@"WPAddCategoryViewController" bundle:nil];
-    addCategoryViewController.blog = self.post.blog;
-	if (IS_IPAD == YES) {
-        [segmentedTableViewController pushViewController:addCategoryViewController animated:YES];
- 	} else {
-		UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:addCategoryViewController];
-		[segmentedTableViewController presentModalViewController:nc animated:YES];
-	}
 }
 
 - (void)discard {
@@ -1338,20 +1324,6 @@ NSString *const EditPostViewControllerAutosaveDidFailNotification = @"EditPostVi
 	isShowingKeyboard = NO;
     [self positionTextView:notification];
     [self positionAutosaveView:notification];
-}
-
-#pragma mark -
-#pragma mark UIPopoverController delegate
-
-- (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController {
-    if ((popoverController.contentViewController) && ([popoverController.contentViewController class] == [UINavigationController class])) {
-        UINavigationController *nav = (UINavigationController *)popoverController.contentViewController;
-        if ([nav.viewControllers count] == 2) {
-            WPSegmentedSelectionTableViewController *selController = [nav.viewControllers objectAtIndex:0];
-            [selController popViewControllerAnimated:YES];
-        }
-    }
-    return YES;
 }
 
 #pragma mark -
