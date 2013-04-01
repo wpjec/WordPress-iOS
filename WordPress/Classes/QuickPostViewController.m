@@ -111,7 +111,7 @@ typedef enum {
 
     if (self.blogSelector.blogCount > 1) {
         CGRect frame = self.overflowView.frame;
-        frame.origin.y += self.blogSelector.frame.size.height;
+        frame.origin.y += self.blogSelector.frame.size.height + 2.0f; // extra 2px to account for the separator
         self.overflowView.frame = frame;
     }
 

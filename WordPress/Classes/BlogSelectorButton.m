@@ -85,8 +85,8 @@
     }
 
     CGRect blogTitleFrame = self.bounds;
-    blogTitleFrame.origin.x = blavatarFrame.origin.x + blavatarFrame.size.width;
-    blogTitleFrame.size.width -= (postToFrame.size.width + blavatarFrame.size.width + selectorImageFrame.size.width) + (padding * 3);
+    blogTitleFrame.origin.x = blavatarFrame.origin.x + blavatarFrame.size.width + padding;
+    blogTitleFrame.size.width -= (postToFrame.size.width + blavatarFrame.size.width + selectorImageFrame.size.width) + (padding * 6);
     if (active) {
         blogTitleFrame.size.height = normalFrame.size.height;
     }
