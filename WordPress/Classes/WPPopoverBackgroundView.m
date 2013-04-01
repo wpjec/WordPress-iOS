@@ -76,7 +76,7 @@
     CGFloat top = 0.0;
     CGFloat coordinate = 0.0;
     CGAffineTransform rotation = CGAffineTransformIdentity;
-    CGPoint arrowCenter;
+    CGPoint arrowCenter = CGPointZero;
 
     switch (self.arrowDirection) {
         case UIPopoverArrowDirectionUp:
