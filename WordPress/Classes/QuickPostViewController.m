@@ -67,6 +67,7 @@ typedef enum {
 - (void)keyboardWillShow:(NSNotification *)notification;
 - (void)keyboardWillHide:(NSNotification *)notification;
 - (void)post;
+- (void)resignTextResponders;
 - (void)showPhotoPicker:(UIImagePickerControllerSourceType)sourceType;
 - (void)showPhotoPickerPopover:(UIPopoverController *)popover;
 
@@ -215,8 +216,7 @@ typedef enum {
 
     if (gesture.state == UIGestureRecognizerStateEnded) {
         if (IS_IPHONE && UIDeviceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-            [self.titleTextField resignFirstResponder];
-            [self.bodyTextView resignFirstResponder];
+            [self resignTextResponders];
         }
 
         CGPoint relativePoint = [gesture locationInView:self.view];
@@ -319,6 +319,12 @@ typedef enum {
             self.navigationItem.rightBarButtonItem.enabled = YES;
         });
     });
+}
+
+- (void)resignTextResponders {
+    [self.tagsTextField resignFirstResponder];
+    [self.titleTextField resignFirstResponder];
+    [self.bodyTextView resignFirstResponder];
 }
 
 - (void)showPhotoPicker:(UIImagePickerControllerSourceType)sourceType {
@@ -542,8 +548,7 @@ typedef enum {
 }
 
 - (void)blogSelectorButtonWillBecomeActive:(BlogSelectorButton *)button {
-    [self.titleTextField resignFirstResponder];
-    [self.bodyTextView resignFirstResponder];
+    [self resignTextResponders];
 
     [self finishDragInDirection:UISwipeGestureRecognizerDirectionDown];
 }
@@ -582,8 +587,7 @@ typedef enum {
 #pragma mark - Quick Photo preview view delegate
 
 - (void)pictureWillZoom {
-    [self.titleTextField resignFirstResponder];
-    [self.bodyTextView resignFirstResponder];
+    [self resignTextResponders];
     [self.view bringSubviewToFront:self.photoPreview];
 }
 
