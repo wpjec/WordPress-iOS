@@ -125,7 +125,9 @@ typedef enum {
     frame.size.height = self.view.frame.size.height + ABS(frame.origin.y);
     self.overflowView.frame = frame;
     previousFrame = self.overflowView.frame;
-    originalFrame = self.overflowView.frame;
+    if (!isDragged) {
+        originalFrame = self.overflowView.frame;
+    }
 
     if (isFirstView) {
         isFirstView = NO;
@@ -260,15 +262,17 @@ typedef enum {
         return;
     }
 
+    frame.origin.y = finalY;
+    frame.size.height = self.view.frame.size.height + heightOffset;
+    // We set this before the animation completes in case another animation (such as the keyboard animation) needs to use this frame as well
+    previousFrame = frame;
+
     [UIView animateWithDuration:0.1f animations:^{
-        frame.origin.y = finalY;
-        frame.size.height = self.view.frame.size.height + heightOffset;
         self.overflowView.frame = frame;
     } completion:^(BOOL finished) {
         isDragging = NO;
         isDragged = (direction == UISwipeGestureRecognizerDirectionDown);
         self.panGesture.enabled = YES;
-        previousFrame = self.overflowView.frame;
     }];
 }
 
@@ -471,7 +475,7 @@ typedef enum {
         frame.size.height = (keyboardFrame.origin.y - frame.origin.y);
     } else {
         // restore the original frame
-        frame = originalFrame;
+        frame = (isDragged ? previousFrame : originalFrame);
         keyboardOffset = 0;
     }
 
