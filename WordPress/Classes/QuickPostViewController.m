@@ -264,6 +264,8 @@ typedef enum {
     } else {
         finalY = -self.detailsView.frame.size.height;
         heightOffset = self.detailsView.frame.size.height - keyboardOffset;
+
+        [self.bodyTextView becomeFirstResponder];
     }
 
     __block CGRect frame = self.overflowView.frame;
