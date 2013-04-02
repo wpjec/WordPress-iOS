@@ -509,7 +509,8 @@ typedef enum {
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     if (textField == self.tagsTextField) {
-        [self.titleTextField becomeFirstResponder];
+        [self.tagsTextField resignFirstResponder];
+        [self.categoriesButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     } else if (textField == self.titleTextField) {
         [self.bodyTextView becomeFirstResponder];
     }
