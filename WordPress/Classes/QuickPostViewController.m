@@ -96,6 +96,8 @@ typedef enum {
     self.navigationItem.rightBarButtonItem = postButton;
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
 
+    self.title = (self.imageSourceType == QuickPostImageSourceTypeNone ? NSLocalizedString(@"Text Post", @"Quick Post editor screen title for text post") : NSLocalizedString(@"Photo Post", @"Quick Post editor screen title for photo post"));
+
     self.blogSelector.delegate = self;
     [self.blogSelector loadBlogsForType:BlogSelectorButtonTypeQuickPhoto];
 
