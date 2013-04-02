@@ -242,11 +242,7 @@ typedef enum {
 }
 
 - (IBAction)detailsButtonTapped:(id)sender {
-    if (isDragging || isDragged) {
-        return;
-    }
-
-    [self.view bounce:-40.0f];
+    [self finishDragInDirection:(isDragged ? UISwipeGestureRecognizerDirectionUp : UISwipeGestureRecognizerDirectionDown)];
 }
 
 - (void)finishDragInDirection:(UISwipeGestureRecognizerDirection)direction {
