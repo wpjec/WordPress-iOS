@@ -276,7 +276,8 @@ typedef enum {
     // We set this before the animation completes in case another animation (such as the keyboard animation) needs to use this frame as well
     previousFrame = frame;
 
-    [UIView animateWithDuration:0.1f animations:^{
+    [UIView animateWithDuration:0.3f animations:^{
+        [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
         self.overflowView.frame = frame;
     } completion:^(BOOL finished) {
         isDragging = NO;
