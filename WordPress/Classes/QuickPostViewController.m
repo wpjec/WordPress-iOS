@@ -184,6 +184,8 @@ typedef enum {
 }
 
 - (IBAction)chooseCategories:(id)sender {
+    [self resignTextResponders];
+
     WPCategorySelectionTableViewController *categorySelectionViewController = [[WPCategorySelectionTableViewController alloc] initWithNibName:@"WPSelectionTableViewController" bundle:nil];
 
     categorySelectionViewController.delegate = self;
@@ -515,7 +517,6 @@ typedef enum {
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     if (textField == self.tagsTextField) {
-        [self.tagsTextField resignFirstResponder];
         [self.categoriesButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     } else if (textField == self.titleTextField) {
         [self.bodyTextView becomeFirstResponder];
