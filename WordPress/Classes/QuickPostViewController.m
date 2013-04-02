@@ -220,6 +220,15 @@ typedef enum {
     translatedPoint = CGPointMake(dragStart.x, dragStart.y + translatedPoint.y);
     self.overflowView.center = translatedPoint;
 
+    if (keyboardOffset) {
+        CGFloat keyboardYOrigin = ABS(keyboardOffset - self.view.frame.size.height);
+
+        if ([gesture locationInView:self.view].y > keyboardYOrigin) {
+            gesture.enabled = NO;
+            [self finishDragInDirection:UISwipeGestureRecognizerDirectionDown];
+        }
+    }
+
     if (gesture.state == UIGestureRecognizerStateEnded) {
         if (IS_IPHONE && UIDeviceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
             [self resignTextResponders];
