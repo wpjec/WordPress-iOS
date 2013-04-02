@@ -595,6 +595,7 @@ typedef enum {
 
 - (void)pictureWillZoom {
     [self resignTextResponders];
+    [self closeDetailsView:NO];
     [self.view bringSubviewToFront:self.photoPreview];
 }
 
